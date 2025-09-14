@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 public class Drink {
-    protected String name;
-    protected Set<String> recipe = new HashSet<String>(); // 음료 재료
+    private String name;
+    private Set<String> recipe = new HashSet<String>(); // 음료 재료
 
     public Drink(String name, List<String> recipe) {
         this.name = name;
@@ -18,6 +18,10 @@ public class Drink {
 
     public Set<String> getRecipe() {
         return this.recipe;
+    }
+
+    public void addIngredient(String ingredient){
+        this.recipe.add(ingredient);
     }
 
 

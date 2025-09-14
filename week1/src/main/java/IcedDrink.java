@@ -6,7 +6,7 @@ public class IcedDrink extends Drink{
     protected String temperature = "cold";
     public IcedDrink(String name, List<String> recipe) {
         super(name, recipe);
-        this.recipe.add("얼음");
+        this.addIngredient("얼음");
     }
 }
 

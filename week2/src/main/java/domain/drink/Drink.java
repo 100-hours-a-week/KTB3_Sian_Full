@@ -19,16 +19,16 @@ public abstract class Drink {
         return this.name;
     }
 
+    public Set<Ingredient> getIngredients() {
+        return this.ingredients;
+    }
+
     public void printRecipe() {
         System.out.print(this.name + ": ");
         for(Ingredient ing : this.ingredients) {
             System.out.print(ing.getName() + " ");
         }
         System.out.println();
-    }
-
-    public Set<Ingredient> getIngredients() {
-        return this.ingredients;
     }
 
     // 레시피에 재료 추가

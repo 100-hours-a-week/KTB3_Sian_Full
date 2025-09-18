@@ -17,10 +17,7 @@ public class Smoothie extends IcedDrink {
 
     @Override
     public void printRecipe() {
-        System.out.print(this.getName() + ": ");
-        for(Ingredient ing : this.getIngredients()) {
-            System.out.print(ing.getName() + " ");
-        }
+        super.printRecipe();
         System.out.println("+ 블렌딩하기");
     }
 }

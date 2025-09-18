@@ -16,5 +16,6 @@ public class IcedDrink extends Drink {
     public boolean isCorrectRecipe(Set<Ingredient> ingredients, boolean isHeated, boolean isBlended) {
         return isCorrectIngredients(ingredients); // 재료 확인
     }
-}
 
+
+}

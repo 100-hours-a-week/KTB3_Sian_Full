@@ -2,12 +2,14 @@ import domain.Ingredient;
 import domain.drink.Drink;
 import domain.drink.DrinkCatalog;
 
-import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class Game {
     public void startGame() {
+        // 배경음 스레드
+        BGMPlayer bgm = new BGMPlayer();
+        bgm.start();
+
         // 인트로 (게임 설명)
         UI.Intro();
 

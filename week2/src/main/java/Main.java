@@ -1,5 +1,3 @@
-import domain.Ingredient;
-import domain.IngredientCatalog;
 import domain.drink.*;
 
 import java.util.*;

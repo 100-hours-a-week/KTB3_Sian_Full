@@ -4,9 +4,7 @@ import com.example.library.dto.BookDto;
 import com.example.library.service.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,4 +32,17 @@ public class BookController {
         model.addAttribute("book", book);
         return "books/detail";
     }
+
+    @GetMapping("/new")
+    public String newBookForm(Model model) {
+        model.addAttribute("bookDto", new BookDto());
+        return "books/form";
+    }
+
+    @PostMapping
+    public String createBook(@ModelAttribute BookDto bookDto) {
+        bookService.createBook(bookDto);
+        return "redirect:/books";
+    }
+
 }

@@ -14,9 +14,13 @@ import java.util.List;
 public class BookService {
     private final BookRepository bookRepository;
 
-    @Autowired
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
+    }
+
+    // 도서 등록
+    public BookDto createBook(BookDto book) {
+        return bookRepository.save(book);
     }
 
     // id 오름차순

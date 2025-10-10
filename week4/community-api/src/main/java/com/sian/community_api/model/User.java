@@ -1,6 +1,4 @@
 package com.sian.community_api.model;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -12,6 +10,7 @@ public class User {
     private String email;
     private String nickname;
     private String password;
+    @Builder.Default
     private boolean isDeleted = false;
     private String profileImage;
 

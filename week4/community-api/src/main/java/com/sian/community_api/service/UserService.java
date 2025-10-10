@@ -1,5 +1,6 @@
 package com.sian.community_api.service;
 
+import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.model.User;
 import com.sian.community_api.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,14 @@ public class UserService {
 
     // 회원가입
     public User createUser(User user) {
+        // 이메일 중복 409
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다.");
+            throw new CustomException(HttpStatus.CONFLICT, "duplicate_email");
         }
 
+        // 닉네임 중복 409
         if (userRepository.findByNickname(user.getNickname()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"duplicate_email");
         }
 
         return userRepository.save(user);

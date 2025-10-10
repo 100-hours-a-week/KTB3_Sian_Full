@@ -23,7 +23,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User signup(@Valid @RequestBody UserSignupRequest request) {
         if (!request.isPasswordConfirmed()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 다릅니다.");
         }
 
         User user = User.builder()

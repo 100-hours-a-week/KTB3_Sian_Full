@@ -18,14 +18,18 @@ public class UserRepository extends BaseRepository<User> {
 
     // 이메일로 조회
     public Optional<User> findByEmail(String email) {
-        return Optional.ofNullable(store.get(email));
+        return store.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
     }
+
 
     // 닉네임으로 조회
     public Optional<User> findByNickname(String nickname) {
-        return Optional.ofNullable(store.get(nickname));
+        return store.values().stream()
+                .filter(user -> user.getNickname().equals(nickname))
+                .findFirst();
     }
-
     @Override
     protected Long getId(User user) {
         return user.getId();

@@ -1,6 +1,7 @@
 package com.sian.community_api.controller;
 
 import com.sian.community_api.dto.user.UserSignupRequest;
+import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.model.User;
 import com.sian.community_api.service.UserService;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User signup(@Valid @RequestBody UserSignupRequest request) {
         if (!request.isPasswordConfirmed()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호가 다릅니다.");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 다릅니다.");
         }
 
         User user = User.builder()

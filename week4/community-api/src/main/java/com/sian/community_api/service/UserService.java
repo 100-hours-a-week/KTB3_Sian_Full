@@ -22,12 +22,12 @@ public class UserService {
     public User createUser(User user) {
         // 이메일 중복 409
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new CustomException(HttpStatus.CONFLICT, "duplicate_email");
+            throw new CustomException(HttpStatus.CONFLICT, "duplicate_email", "이미 사용 중인 이메일입니다.");
         }
 
         // 닉네임 중복 409
         if (userRepository.findByNickname(user.getNickname()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"duplicate_email");
+            throw new CustomException(HttpStatus.CONFLICT,"duplicate_nickname", "이미 사용 중인 닉네임입니다.");
         }
 
         return userRepository.save(user);

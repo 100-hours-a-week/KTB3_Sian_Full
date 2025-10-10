@@ -1,6 +1,7 @@
 package com.sian.community_api.controller;
 
 import com.sian.community_api.dto.user.UserSignupRequest;
+import com.sian.community_api.dto.user.UserSignupResponse;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.model.User;
 import com.sian.community_api.service.UserService;
@@ -22,9 +23,9 @@ public class UserController {
     // 회원가입 API
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public User signup(@Valid @RequestBody UserSignupRequest request) {
+    public UserSignupResponse signup(@Valid @RequestBody UserSignupRequest request) {
         if (!request.isPasswordConfirmed()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 다릅니다.");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 일치하지 않습니다.");
         }
 
         User user = User.builder()
@@ -34,7 +35,8 @@ public class UserController {
                 .profileImage(request.getProfileImage())
                 .build();
 
-        return userService.createUser(user);
+        User created = userService.createUser(user);
+        return UserSignupResponse.from(created);
     }
 
 }

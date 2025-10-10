@@ -1,7 +1,12 @@
 package com.sian.community_api.model;
 
-public class Like {
-    private Long postId;
-    private Long userId; 
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+public class Like {
+    private Long id;
+    private Long userId;
+    private Long postId;
 }

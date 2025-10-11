@@ -18,6 +18,15 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND,
+                        "user_not_found",
+                        "사용자를 찾을 수 없습니다."
+                ));
+    }
+
     // 회원가입
     public User createUser(User user) {
         // 이메일 중복 409
@@ -35,8 +44,8 @@ public class UserService {
 
     // 내 정보 수정
     public User updateUser(String email, String newNickname, String newProfileImage) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "user_not_found","사용자를 찾을 수 없습니다."));
+
+        User user = getUserByEmail(email);
 
         // 닉네임 변경
         if (newNickname != null && !newNickname.isBlank() && !newNickname.equals(user.getNickname())) {
@@ -55,11 +64,11 @@ public class UserService {
     }
 
     // 회원 탈퇴
-    public void deleteUser(Long id, String emailFromToken) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "user_not_found", "존재하지 않는 사용자입니다." ));
+    public void deleteUser(String email) {
 
-        if (!user.getEmail().equals(emailFromToken)) {
+        User user = getUserByEmail(email);
+
+        if (!user.getEmail().equals(email)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "not_your_account", "본인의 계정이 아닙니다.");
         }
 

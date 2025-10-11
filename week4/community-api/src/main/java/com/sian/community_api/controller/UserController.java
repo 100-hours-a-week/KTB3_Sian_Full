@@ -78,11 +78,11 @@ public class UserController {
     // 회원 탈퇴
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<Void> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
+    public ApiResponse<Void> deleteUser(@RequestHeader("Authorization") String authHeader) {
 
         String email = authUtil.extractEmail(authHeader);
 
-        userService.deleteUser(id, email);
+        userService.deleteUser(email);
 
         return ApiResponse.success(200, "회원탈퇴가 완료되었습니다.", null);
     }

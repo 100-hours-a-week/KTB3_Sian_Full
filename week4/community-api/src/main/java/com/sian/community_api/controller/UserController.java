@@ -10,7 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import com.sian.community_api.dto.common.ApiResponse;
 
 import java.util.Map;
 
@@ -25,7 +25,8 @@ public class UserController {
     // 회원가입 API
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserSignupResponse signup(@Valid @RequestBody UserSignupRequest request) {
+    public ApiResponse<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest request) {
+
         if (!request.isPasswordConfirmed()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 일치하지 않습니다.");
         }
@@ -38,12 +39,15 @@ public class UserController {
                 .build();
 
         User created = userService.createUser(user);
-        return UserSignupResponse.from(created);
+        UserSignupResponse response = UserSignupResponse.from(created);
+
+        return ApiResponse.created(response);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, String> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
+    public ApiResponse<Void> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
+
         // 헤더에서 토큰 추출
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "missing_token", "토큰이 없습니다.");
@@ -59,7 +63,7 @@ public class UserController {
 
         userService.deleteUser(id, email);
 
-        return Map.of("message", "회원 탈퇴가 완료되었습니다.");
+        return ApiResponse.success(200, "회원탈퇴가 완료되었습니다.", null);
     }
 
 }

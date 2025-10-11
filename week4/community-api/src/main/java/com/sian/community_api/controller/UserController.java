@@ -55,8 +55,10 @@ public class UserController {
         return ApiResponse.ok(UserSignupResponse.from(user));
     }
 
-    // 회원 탈퇴
     @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    // 회원 탈퇴
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
 

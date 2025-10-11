@@ -22,7 +22,7 @@ public class UserController {
     private final AuthUtil authUtil;
 
     // 회원가입 API
-    @PostMapping("/signup")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest request) {
 
@@ -44,7 +44,7 @@ public class UserController {
     }
 
     // 내 정보 조회
-    @GetMapping("/{id}")
+    @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<UserSignupResponse> getMyInfo(
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     // 내 정보 수정
-    @PatchMapping("/{id}")
+    @PatchMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<UserSignupResponse> updateUserInfo(
             @RequestHeader("Authorization") String authHeader,
@@ -76,7 +76,7 @@ public class UserController {
 
 
     // 회원 탈퇴
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
 

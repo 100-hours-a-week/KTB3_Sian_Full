@@ -33,7 +33,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // 내 정보 조회
+    // 내 정보 수정
     public User updateUser(String email, String newNickname, String newProfileImage) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "user_not_found","사용자를 찾을 수 없습니다."));
@@ -53,8 +53,6 @@ public class UserService {
 
         return user;
     }
-
-    // 내 정보 수정 (프로필이미지, 닉네임)
 
     // 회원 탈퇴
     public void deleteUser(Long id, String emailFromToken) {

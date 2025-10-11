@@ -13,8 +13,12 @@ public class AuthUtil {
     private final JwtTokenProvider jwtTokenProvider;
 
     public String extractEmail(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "missing_token", "토큰이 없습니다.");
+        }
+
+        if (!authHeader.startsWith("Bearer ")) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_token_format", "올바르지 않은 토큰 형식입니다.");
         }
 
         String token = authHeader.substring(7); // "Bearer " 제거

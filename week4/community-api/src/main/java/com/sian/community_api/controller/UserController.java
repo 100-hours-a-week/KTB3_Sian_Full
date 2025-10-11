@@ -1,9 +1,9 @@
 package com.sian.community_api.controller;
 
+import com.sian.community_api.auth.AuthUtil;
 import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.dto.user.UserSignupResponse;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.jwt.JwtTokenProvider;
 import com.sian.community_api.model.User;
 import com.sian.community_api.service.UserService;
 import jakarta.validation.Valid;
@@ -12,15 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import com.sian.community_api.dto.common.ApiResponse;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/users")
 @AllArgsConstructor
 public class UserController {
 
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthUtil authUtil;
 
     // 회원가입 API
     @PostMapping("/signup")
@@ -44,26 +42,28 @@ public class UserController {
         return ApiResponse.created(response);
     }
 
+    // 내 정보 조회
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<UserSignupResponse> getMyInfo(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        String email = authUtil.extractEmail(authHeader);
+
+        User user = userService.findByEmail(email);
+
+        return ApiResponse.ok(UserSignupResponse.from(user));
+    }
+
+    // 회원 탈퇴
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String authHeader) {
 
-        // 헤더에서 토큰 추출
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "missing_token", "토큰이 없습니다.");
-        }
-        String token = authHeader.substring(7); // "Bearer " 제거
-
-        // 토큰 검증
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_token", "토큰이 유효하지 않습니다.");
-        }
-
-        String email = jwtTokenProvider.getEmailFromToken(token);
+        String email = authUtil.extractEmail(authHeader);
 
         userService.deleteUser(id, email);
 
         return ApiResponse.success(200, "회원탈퇴가 완료되었습니다.", null);
     }
-
 }

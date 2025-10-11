@@ -29,4 +29,8 @@ public class User {
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

@@ -3,7 +3,9 @@ package com.sian.community_api.service;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.model.User;
 import com.sian.community_api.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -11,12 +13,10 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final BCryptPasswordEncoder passwordEncoder;
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -39,6 +39,8 @@ public class UserService {
             throw new CustomException(HttpStatus.CONFLICT,"duplicate_nickname", "이미 사용 중인 닉네임입니다.");
         }
 
+        // 비밀번호 암호화 및 저장
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -62,6 +64,26 @@ public class UserService {
 
         return user;
     }
+
+    // 비밀번호 변경
+    public void updatePassword(String email, String currentPassword, String newPassword) {
+
+        User user = getUserByEmail(email);
+
+        // 현재 비밀번호 확인
+        if (!user.getPassword().equals(currentPassword)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_current", "현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호와 현재 비밀번호가 일치
+        if (currentPassword.equals(newPassword)) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "same_password", "새 비밀번호는 기존 비밀번호와 달라야 합니다.");
+        }
+
+        // 새 비밀번호 암호화 후 저장
+        user.setPassword(passwordEncoder.encode(newPassword));
+    }
+
 
     // 회원 탈퇴
     public void deleteUser(String email) {

@@ -7,24 +7,29 @@ import com.sian.community_api.jwt.JwtTokenProvider;
 import com.sian.community_api.model.User;
 import com.sian.community_api.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BCryptPasswordEncoder passwordEncoder;
 
+    // 로그인
     public TokenResponse login(UserLoginRequest request) {
 
+        // 이메일 틀린 경우
         User user = userRepository.findByEmail(request.getEmail())
-                .orElse(null);
+                .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다."));
 
-        // 이메일과 비밀번호 중 하나라도 틀린 경우
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호를 확인해주세요.");
+        // 비밀번호 틀린 경우
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         String token = jwtTokenProvider.generateToken(user.getEmail());

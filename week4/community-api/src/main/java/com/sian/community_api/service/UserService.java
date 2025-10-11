@@ -38,6 +38,20 @@ public class UserService {
     // 내 정보 수정 (프로필이미지, 닉네임)
 
     // 회원 탈퇴
+    public void deleteUser(Long id, String emailFromToken) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "user_not_found", "존재하지 않는 사용자입니다." ));
+
+        if (!user.getEmail().equals(emailFromToken)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "not_your_account", "본인의 계정이 아닙니다.");
+        }
+
+        if (user.isDeleted()) {
+            throw new CustomException(HttpStatus.CONFLICT, "already_deleted", "이미 탈퇴한 사용자입니다.");
+        }
+
+        user.delete();
+    }
 
     // 사용자 id 오름차순으로 가져오기
     public List<User> getAllUsers() {

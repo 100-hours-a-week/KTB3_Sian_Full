@@ -3,6 +3,7 @@ package com.sian.community_api.controller;
 import com.sian.community_api.auth.AuthUtil;
 import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.dto.user.UserSignupResponse;
+import com.sian.community_api.dto.user.UserUpdateRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.model.User;
 import com.sian.community_api.service.UserService;
@@ -55,8 +56,25 @@ public class UserController {
         return ApiResponse.ok(UserSignupResponse.from(user));
     }
 
+    // 내 정보 수정
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<UserSignupResponse> updateUserInfo(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody UserUpdateRequest request) {
+
+        String email = authUtil.extractEmail(authHeader);
+
+        User updatedUser = userService.updateUser(
+                email,
+                request.getNickname(),
+                request.getProfileImage()
+        );
+
+        return ApiResponse.ok(UserSignupResponse.from(updatedUser));
+    }
+
+
     // 회원 탈퇴
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

@@ -34,6 +34,25 @@ public class UserService {
     }
 
     // 내 정보 조회
+    public User updateUser(String email, String newNickname, String newProfileImage) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "user_not_found","사용자를 찾을 수 없습니다."));
+
+        // 닉네임 변경
+        if (newNickname != null && !newNickname.isBlank() && !newNickname.equals(user.getNickname())) {
+            userRepository.findByNickname(newNickname).ifPresent(existing -> {
+                throw new CustomException(HttpStatus.CONFLICT, "duplicate_nickname", "이미 사용 중인 닉네임입니다.");
+            });
+            user.setNickname(newNickname);
+        }
+
+        // 프로필 이미지 변경
+        if (newProfileImage != null && !newProfileImage.isBlank() && !newProfileImage.equals(user.getProfileImage())) {
+            user.setProfileImage(newProfileImage);
+        }
+
+        return user;
+    }
 
     // 내 정보 수정 (프로필이미지, 닉네임)
 

@@ -1,7 +1,7 @@
 package com.sian.community_api.service;
 
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.model.User;
+import com.sian.community_api.domain.User;
 import com.sian.community_api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

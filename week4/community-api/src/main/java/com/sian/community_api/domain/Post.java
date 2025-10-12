@@ -1,4 +1,4 @@
-package com.sian.community_api.model;
+package com.sian.community_api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

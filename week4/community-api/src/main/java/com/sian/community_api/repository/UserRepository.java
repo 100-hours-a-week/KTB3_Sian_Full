@@ -1,6 +1,6 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.model.User;
+import com.sian.community_api.domain.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

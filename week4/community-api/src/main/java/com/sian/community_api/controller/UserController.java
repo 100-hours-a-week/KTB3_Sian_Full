@@ -5,7 +5,7 @@ import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.dto.user.UserSignupResponse;
 import com.sian.community_api.dto.user.UserUpdateRequest;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.model.User;
+import com.sian.community_api.domain.User;
 import com.sian.community_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

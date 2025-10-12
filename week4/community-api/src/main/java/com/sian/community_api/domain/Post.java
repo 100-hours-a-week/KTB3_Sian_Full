@@ -1,25 +1,39 @@
 package com.sian.community_api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Post {
     private Long id;
-    private User author; // author id
+    private User author;
     private String title;
     private String content; // 게시글 텍스트 내용
-
-    @JsonProperty("post_image")
     private String postImage;
 
-    @JsonProperty("created_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt; // 2021-01-01 00:00:00 형태
+    private LocalDateTime createdAt = LocalDateTime.now(); // 2021-01-01 00:00:00 형태
 
-    private Set<Like> likes; // 좋아요수
-    private int views; // 조회수
-    private int comments;
+    private int likeCount; // 좋아요수
+    private int viewCount; // 조회수
+
+    private Set<Comment> comments = new HashSet<>(); // 댓글 리스트
+    private int commentCount = comments.size(); // 댓글 수
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+
 }

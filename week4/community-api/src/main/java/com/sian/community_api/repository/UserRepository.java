@@ -1,6 +1,9 @@
 package com.sian.community_api.repository;
 
 import com.sian.community_api.domain.User;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -8,11 +11,15 @@ import java.util.*;
 @Repository
 public class UserRepository extends BaseRepository<User> {
 
-    public UserRepository() {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserRepository(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+
         if (store.isEmpty()) {
-            save(new User(null, "sian@example.com", "sian", "Abcd1234!", false, "profile1.jpeg"));
-            save(new User(null, "startup@example.com", "startup", "Asdf0000+", false, "profile2.jpeg"));
-            save(new User(null, "spring@example.com", "spring", "Spring1!", false, "profile3.png"));
+            save(new User(null, "sian@example.com", "sian", passwordEncoder.encode("Abcd1234!"), false, "profile1.jpeg"));
+            save(new User(null, "startup@example.com", "startup", passwordEncoder.encode("Asdf0000+"), false, "profile2.jpeg"));
+            save(new User(null, "spring@example.com", "spring", passwordEncoder.encode("Spring1!"), false, "profile3.png"));
         }
     }
 

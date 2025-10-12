@@ -21,6 +21,7 @@ public class Post {
     private String content; // 게시글 텍스트 내용
     private String postImage;
 
+    @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now(); // 2021-01-01 00:00:00 형태
 

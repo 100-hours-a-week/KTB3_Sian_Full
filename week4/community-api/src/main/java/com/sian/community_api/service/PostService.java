@@ -3,6 +3,7 @@ package com.sian.community_api.service;
 import com.sian.community_api.domain.Post;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.dto.post.PostCreateRequest;
+import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
 import com.sian.community_api.repository.UserRepository;
@@ -18,6 +19,17 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+
+    // 게시글 제목, 내용 유효성 검증
+    private void validatePostContent(String title, String content) {
+        if ((title == null || title.isBlank()) || (content == null || content.isBlank())) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목과 내용을 모두 작성해주세요.");
+        }
+
+        if (title != null && title.length() > 26) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목은 최대 26자까지 작성 가능합니다.");
+        }
+    }
 
     // 게시글 전체 조회
     public List<Post> getAllPosts() {
@@ -39,25 +51,7 @@ public class PostService {
         String title = request.getTitle();
         String content = request.getContent();
 
-        // 둘 다 비었을 때
-        if ((title == null || title.isBlank()) && (content == null || content.isBlank())) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목과 내용을 모두 작성해주세요.");
-        }
-
-        // 제목이 null이거나 ""인 경우
-        if (title == null || title.isBlank()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목을 입력해주세요.");
-        }
-
-        // 내용이 null이거나 ""인 경우
-        if (content == null || content.isBlank()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "내용을 입력해주세요.");
-        }
-
-        // 제목 26자 초과한 경우
-        if (title != null && title.length() > 26) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목은 최대 26자까지 작성 가능합니다.");
-        }
+        validatePostContent(title, content);
 
         Post post = Post.builder()
                 .author(author)
@@ -70,5 +64,27 @@ public class PostService {
                 .build();
 
         return postRepository.save(post);
+    }
+
+    // 게시글 수정
+    public Post updatePost(Long postId, String userEmail, PostUpdateRequest request) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."));
+
+        if (!post.getAuthor().getEmail().equals(userEmail)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 수정할 수 있습니다.");
+        }
+
+        String title = request.getTitle();
+        String content = request.getContent();
+        String postImage = request.getPostImage();
+
+        validatePostContent(title, content);
+
+        post.setTitle(title.trim());
+        post.setContent(content);
+        post.setPostImage(postImage);
+
+        return post;
     }
 }

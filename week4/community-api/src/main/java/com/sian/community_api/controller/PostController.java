@@ -6,6 +6,7 @@ import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.post.PostCreateRequest;
 import com.sian.community_api.dto.post.PostDetailResponse;
 import com.sian.community_api.dto.post.PostSummaryResponse;
+import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.service.PostService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -33,9 +34,17 @@ public class PostController {
 
     // 게시글 상세 조회
     @GetMapping("/{id}")
-    public ApiResponse<PostDetailResponse> getPostById(@RequestHeader("Authorization") String authHeader, @PathVariable Long id) {
+    public ApiResponse<PostDetailResponse> getPostById(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long id) {
+        String email = null;
 
-        String email = authUtil.extractEmail(authHeader);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                email = authUtil.extractEmail(authHeader);
+            } catch (Exception e) {
+                // 유효하지 않은 토큰일경우 null 처리
+                email = null;
+            }
+        }
         Post post = postService.getPostById(id);
         PostDetailResponse response = PostDetailResponse.from(post, email);
         return ApiResponse.ok(response);
@@ -50,5 +59,19 @@ public class PostController {
         String userEmail = authUtil.extractEmail(authHeader);
         Post createdPost = postService.createPost(userEmail, request);
         return ApiResponse.created(PostDetailResponse.from(createdPost,userEmail));
+    }
+
+    // 게시글 수정
+    @PutMapping("/{id}")
+    public ApiResponse<PostDetailResponse> updatePost(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long id,
+            @RequestBody PostUpdateRequest request
+    ) {
+        String userEmail = authUtil.extractEmail(authHeader);
+
+        Post updatedPost = postService.updatePost(id, userEmail, request);
+
+        return ApiResponse.ok(PostDetailResponse.from(updatedPost, userEmail));
     }
 }

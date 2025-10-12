@@ -28,13 +28,24 @@ public class Post {
     private int likeCount; // 좋아요수
     private int viewCount; // 조회수
 
+    @Builder.Default
     private Set<Comment> comments = new HashSet<>(); // 댓글 리스트
-    private int commentCount = comments.size(); // 댓글 수
+    @Builder.Default
+    private int commentCount = 0; // 댓글 수
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
 
+    public void setPostImage(String postImage) {
+        this.postImage = postImage;
+    }
 }

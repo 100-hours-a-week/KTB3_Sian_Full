@@ -1,8 +1,6 @@
 package com.sian.community_api.repository;
 
 import com.sian.community_api.domain.User;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 

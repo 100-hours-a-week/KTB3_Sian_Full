@@ -115,4 +115,15 @@ public class PostService {
 
         return post;
     }
+
+     public void deletePost(Long postId, String userEmail) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."));
+
+        if (!post.getAuthor().getEmail().equals(userEmail)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 삭제할 수 있습니다.");
+        }
+
+        postRepository.delete(postId);
+    }
 }

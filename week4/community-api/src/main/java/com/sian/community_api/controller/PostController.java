@@ -8,6 +8,7 @@ import com.sian.community_api.service.PostService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public class PostController {
     private final PostService postService;
     private final AuthUtil authUtil;
 
-    // 전체 게시글 조회
+    // 전체 게시글 목록 조회 (페이징 + 정렬)
+    // 기본 정렬 : 최신순
     @GetMapping
     public ApiResponse<PostPageResponse> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -36,7 +38,7 @@ public class PostController {
         Page<PostSummaryResponse> postPage = postService.getPagedPosts(page, size, sortField, direction);
         PostPageResponse response = PostPageResponse.from(postPage);
 
-        return ApiResponse.success(200, "fetch_posts_success", response);
+        return ApiResponse.ok(response);
     }
 
     // 게시글 상세 조회
@@ -57,7 +59,6 @@ public class PostController {
         return ApiResponse.ok(response);
     }
 
-    // 게시글 작성
     @PostMapping
     public ApiResponse<PostDetailResponse> createPost(
             @RequestHeader("Authorization") String authHeader,
@@ -68,17 +69,27 @@ public class PostController {
         return ApiResponse.created(PostDetailResponse.from(createdPost,userEmail));
     }
 
-    // 게시글 수정
     @PutMapping("/{id}")
     public ApiResponse<PostDetailResponse> updatePost(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable Long id,
+            @PathVariable("id") Long postId,
             @RequestBody PostUpdateRequest request
     ) {
         String userEmail = authUtil.extractEmail(authHeader);
 
-        Post updatedPost = postService.updatePost(id, userEmail, request);
+        Post updatedPost = postService.updatePost(postId, userEmail, request);
 
         return ApiResponse.ok(PostDetailResponse.from(updatedPost, userEmail));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> deletePost(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable("id") Long postId
+    ) {
+        String userEmail = authUtil.extractEmail(authHeader);
+        postService.deletePost(postId, userEmail);
+        return ApiResponse.success(200, "게시글이 삭제되었습니다.", null);
     }
 }

@@ -34,6 +34,10 @@ public abstract class BaseRepository<T> {
         sequence = 0;
     }
 
+    public void delete(Long id) {
+        store.remove(id);
+    }
+
     // 각 레포지토리에서 정의
     protected abstract Long getId(T model);
     protected abstract void setId(T model, Long id);

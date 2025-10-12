@@ -18,20 +18,21 @@ public class Post {
     private Long id;
     private User author;
     private String title;
-    private String content; // 게시글 텍스트 내용
+    private String content;
     private String postImage;
 
     @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now(); // 2021-01-01 00:00:00 형태
 
-    private int likeCount; // 좋아요수
-    private int viewCount; // 조회수
+    private int likeCount;
+    private int viewCount;
 
     @Builder.Default
-    private Set<Comment> comments = new HashSet<>(); // 댓글 리스트
+    private Set<Comment> comments = new HashSet<>();
+
     @Builder.Default
-    private int commentCount = 0; // 댓글 수
+    private int commentCount = 0;
 
     public void setId(Long id) {
         this.id = id;
@@ -47,5 +48,13 @@ public class Post {
 
     public void setPostImage(String postImage) {
         this.postImage = postImage;
+    }
+
+    public void incrementLike() {
+        this.likeCount++;
+    }
+
+    public void decrementLike() {
+        if (this.likeCount > 0 ) this.likeCount--;
     }
 }

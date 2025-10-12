@@ -1,10 +1,11 @@
 package com.sian.community_api.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Like {
     private Long id;
     private Long userId;

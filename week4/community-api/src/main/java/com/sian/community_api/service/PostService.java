@@ -3,14 +3,20 @@ package com.sian.community_api.service;
 import com.sian.community_api.domain.Post;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.dto.post.PostCreateRequest;
+import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
 import com.sian.community_api.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -31,9 +37,31 @@ public class PostService {
         }
     }
 
-    // 게시글 전체 조회
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    // 전체 게시글 조회
+    public Page<PostSummaryResponse> getPagedPosts(int page, int size, String sortField, String direction) {
+        List<Post> allPosts = postRepository.findAll();
+
+        Comparator<Post> comparator;
+        switch (sortField) {
+            case "likes" -> comparator = Comparator.comparing(Post::getLikeCount);
+            case "views" -> comparator = Comparator.comparing(Post::getViewCount);
+            default -> comparator = Comparator.comparing(Post::getCreatedAt);
+        }
+
+        if (direction.equalsIgnoreCase("desc")) comparator = comparator.reversed();
+        allPosts.sort(comparator);
+
+        int start = page * size;
+        int end = Math.min(start + size, allPosts.size());
+        if (start > allPosts.size()) {
+            return new PageImpl<>(List.of(), PageRequest.of(page, size), allPosts.size());
+        }
+
+        List<PostSummaryResponse> content = allPosts.subList(start, end).stream()
+                .map(PostSummaryResponse::from)
+                .toList();
+
+        return new PageImpl<>(content, PageRequest.of(page, size), allPosts.size());
     }
 
     // 게시글 id 조회

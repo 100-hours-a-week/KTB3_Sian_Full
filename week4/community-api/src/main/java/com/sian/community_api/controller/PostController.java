@@ -3,16 +3,15 @@ package com.sian.community_api.controller;
 import com.sian.community_api.auth.AuthUtil;
 import com.sian.community_api.domain.Post;
 import com.sian.community_api.dto.common.ApiResponse;
-import com.sian.community_api.dto.post.PostCreateRequest;
-import com.sian.community_api.dto.post.PostDetailResponse;
-import com.sian.community_api.dto.post.PostSummaryResponse;
-import com.sian.community_api.dto.post.PostUpdateRequest;
+import com.sian.community_api.dto.post.*;
 import com.sian.community_api.service.PostService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,11 +24,19 @@ public class PostController {
 
     // 전체 게시글 조회
     @GetMapping
-    public ApiResponse<List<PostSummaryResponse>> getAllPosts() {
-        List<PostSummaryResponse> response = postService.getAllPosts().stream()
-                .map(PostSummaryResponse::from)
-                .collect(Collectors.toList());
-        return ApiResponse.ok(response);
+    public ApiResponse<PostPageResponse> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at,desc") String sort
+    ) {
+        String[] sortParams = sort.split(",");
+        String sortField = sortParams[0];
+        String direction = sortParams.length > 1 ? sortParams[1] : "desc";
+
+        Page<PostSummaryResponse> postPage = postService.getPagedPosts(page, size, sortField, direction);
+        PostPageResponse response = PostPageResponse.from(postPage);
+
+        return ApiResponse.success(200, "fetch_posts_success", response);
     }
 
     // 게시글 상세 조회

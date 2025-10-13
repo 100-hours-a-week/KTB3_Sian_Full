@@ -63,4 +63,15 @@ public class CommentController {
         Comment updated = commentService.updateComment(commentId, userEmail, request.getContent());
         return ApiResponse.ok(CommentResponse.from(updated, userEmail));
     }
+
+    @DeleteMapping("/{commentId}")
+    public ApiResponse<Void> deleteComment(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long postId,
+            @PathVariable Long commentId
+    ) {
+        String userEmail = authUtill.extractEmail(authHeader);
+        commentService.deleteComment(commentId, userEmail);
+        return ApiResponse.success(200, "댓글이 성공적으로 삭제되었습니다.", null);
+    }
 }

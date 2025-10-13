@@ -98,4 +98,15 @@ public class CommentService {
         return comment;
     }
 
+    public void deleteComment(Long commentId, String userEmail) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."));
+
+        if (!comment.getAuthor().getEmail().equals(userEmail)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 댓글을 삭제할 수 있습니다.");
+        }
+
+        commentRepository.delete(commentId);
+    }
+
 }

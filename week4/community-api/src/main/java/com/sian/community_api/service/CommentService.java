@@ -79,4 +79,23 @@ public class CommentService {
 
         return new PageImpl<>(content, PageRequest.of(page, size), allComments.size());
     }
+
+    public Comment updateComment(Long commentId, String userEmail, String newContent) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."));
+
+        if (!comment.getAuthor().getEmail().equals(userEmail)) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 댓글을 수정할 수 있습니다.");
+        }
+
+        if (newContent == null || newContent.isBlank()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "INVALID_COMMENT", "댓글 내용을 입력해주세요.");
+        }
+
+        comment.updateContent(newContent.trim());
+        commentRepository.save(comment);
+
+        return comment;
+    }
+
 }

@@ -2,7 +2,7 @@ package com.sian.community_api.controller;
 
 import com.sian.community_api.auth.AuthUtil;
 import com.sian.community_api.domain.Comment;
-import com.sian.community_api.dto.Comment.CommentCreateRequest;
+import com.sian.community_api.dto.Comment.CommentRequest;
 import com.sian.community_api.dto.Comment.CommentPageResponse;
 import com.sian.community_api.dto.Comment.CommentResponse;
 import com.sian.community_api.dto.common.ApiResponse;
@@ -43,12 +43,24 @@ public class CommentController {
     public ApiResponse<CommentResponse> createComment(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable Long postId,
-            @Valid @RequestBody CommentCreateRequest request
+            @Valid @RequestBody CommentRequest request
     ) {
         String userEmail = authUtill.extractEmail(authHeader);
 
         Comment comment = commentService.createComment(postId, userEmail, request.getContent());
 
         return ApiResponse.created(CommentResponse.from(comment, userEmail));
+    }
+
+    @PutMapping("/{commentId}")
+    public ApiResponse<CommentResponse> updateComment(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @Valid @RequestBody CommentRequest request
+    ) {
+        String userEmail = authUtill.extractEmail(authHeader);
+        Comment updated = commentService.updateComment(commentId, userEmail, request.getContent());
+        return ApiResponse.ok(CommentResponse.from(updated, userEmail));
     }
 }

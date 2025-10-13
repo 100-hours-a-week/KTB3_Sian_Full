@@ -29,9 +29,6 @@ public class Post {
     private int viewCount;
 
     @Builder.Default
-    private Set<Comment> comments = new HashSet<>();
-
-    @Builder.Default
     private int commentCount = 0;
 
     public void setId(Long id) {

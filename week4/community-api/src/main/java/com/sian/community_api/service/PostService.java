@@ -26,6 +26,18 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    // 게시글 id로 조회
+    public Post getPostById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "해당 게시글을 찾을 수 없습니다."));
+    }
+
+    // 사용자 email로 조회
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "작성자를 찾을 수 없습니다."));
+    }
+
     // 게시글 제목, 내용 유효성 검증
     private void validatePostContent(String title, String content) {
         if ((title == null || title.isBlank()) || (content == null || content.isBlank())) {
@@ -64,18 +76,10 @@ public class PostService {
         return new PageImpl<>(content, PageRequest.of(page, size), allPosts.size());
     }
 
-    // 게시글 id 조회
-    public Post getPostById(Long id) {
-        return postRepository.findById(id)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "해당 게시글을 찾을 수 없습니다."));
-    }
-
     // 게시글 작성
     public Post createPost(String userEmail, PostCreateRequest request) {
 
-        User author = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "작성자를 찾을 수 없습니다."));
-
+        User author = getUserByEmail(userEmail);
         String title = request.getTitle();
         String content = request.getContent();
 
@@ -96,8 +100,7 @@ public class PostService {
 
     // 게시글 수정
     public Post updatePost(Long postId, String userEmail, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."));
+        Post post = getPostById(postId);
 
         if (!post.getAuthor().getEmail().equals(userEmail)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 수정할 수 있습니다.");
@@ -117,8 +120,7 @@ public class PostService {
     }
 
      public void deletePost(Long postId, String userEmail) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."));
+        Post post = getPostById(postId);
 
         if (!post.getAuthor().getEmail().equals(userEmail)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 삭제할 수 있습니다.");

@@ -1,13 +1,11 @@
 package com.sian.community_api.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sian.community_api.domain.Comment;
 import com.sian.community_api.domain.Post;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Getter
 @Builder
@@ -27,8 +25,6 @@ public class PostDetailResponse {
     private String authorNickname;
     private String authorProfileImage;
 
-    private Set<Comment> comments; // CommentResponseDto로 교체 예정
-
     public static PostDetailResponse from(Post post, String currentUserEmail) {
 
         boolean isAuthor = post.getAuthor().getEmail().equals(currentUserEmail);
@@ -44,7 +40,6 @@ public class PostDetailResponse {
                 .createdAt(post.getCreatedAt())
                 .authorNickname(post.getAuthor().getNickname())
                 .authorProfileImage(post.getAuthor().getProfileImage())
-                .comments(post.getComments())
                 .isAuthor(isAuthor)
                 .build();
     }

@@ -1,4 +1,4 @@
-package com.sian.community_api.jwt;
+package com.sian.community_api.config;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

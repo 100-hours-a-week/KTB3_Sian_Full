@@ -1,6 +1,6 @@
 package com.sian.community_api.controller;
 
-import com.sian.community_api.auth.AuthUtil;
+import com.sian.community_api.config.AuthUtil;
 import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.dto.user.UserSignupResponse;
 import com.sian.community_api.dto.user.UserUpdateRequest;

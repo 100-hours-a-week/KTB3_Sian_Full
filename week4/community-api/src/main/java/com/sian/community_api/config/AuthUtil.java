@@ -1,4 +1,4 @@
-package com.sian.community_api.auth;
+package com.sian.community_api.config;
 
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.jwt.JwtTokenProvider;

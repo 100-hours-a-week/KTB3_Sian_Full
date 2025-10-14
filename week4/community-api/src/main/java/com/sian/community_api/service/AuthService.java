@@ -3,7 +3,7 @@ package com.sian.community_api.service;
 import com.sian.community_api.dto.user.TokenResponse;
 import com.sian.community_api.dto.user.UserLoginRequest;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.jwt.JwtTokenProvider;
+import com.sian.community_api.config.JwtTokenProvider;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

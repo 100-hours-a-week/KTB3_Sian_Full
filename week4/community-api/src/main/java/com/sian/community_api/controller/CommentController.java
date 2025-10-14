@@ -1,6 +1,6 @@
 package com.sian.community_api.controller;
 
-import com.sian.community_api.auth.AuthUtil;
+import com.sian.community_api.config.AuthUtil;
 import com.sian.community_api.domain.Comment;
 import com.sian.community_api.dto.Comment.CommentRequest;
 import com.sian.community_api.dto.Comment.CommentPageResponse;

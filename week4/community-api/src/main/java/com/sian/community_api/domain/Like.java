@@ -7,7 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Like {
-    private Long id;
     private Long userId;
     private Long postId;
 }

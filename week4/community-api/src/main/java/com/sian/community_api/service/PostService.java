@@ -1,5 +1,6 @@
 package com.sian.community_api.service;
 
+import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.domain.Post;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.dto.post.PostCreateRequest;
@@ -7,7 +8,6 @@ import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
-import com.sian.community_api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,21 +24,13 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserValidator userValidator;
 
-    // 게시글 id로 조회
     public Post getPostById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "해당 게시글을 찾을 수 없습니다."));
     }
 
-    // 사용자 email로 조회
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "작성자를 찾을 수 없습니다."));
-    }
-
-    // 게시글 제목, 내용 유효성 검증
     private void validatePostContent(String title, String content) {
         if ((title == null || title.isBlank()) || (content == null || content.isBlank())) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목과 내용을 모두 작성해주세요.");
@@ -49,7 +41,6 @@ public class PostService {
         }
     }
 
-    // 전체 게시글 조회
     public Page<PostSummaryResponse> getPagedPosts(int page, int size, String sortField, String direction) {
         List<Post> allPosts = postRepository.findAll();
 
@@ -76,10 +67,9 @@ public class PostService {
         return new PageImpl<>(content, PageRequest.of(page, size), allPosts.size());
     }
 
-    // 게시글 작성
     public Post createPost(String userEmail, PostCreateRequest request) {
 
-        User author = getUserByEmail(userEmail);
+        User author = userValidator.findValidUser(userEmail);
         String title = request.getTitle();
         String content = request.getContent();
 
@@ -98,29 +88,34 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    // 게시글 수정
     public Post updatePost(Long postId, String userEmail, PostUpdateRequest request) {
         Post post = getPostById(postId);
+        userValidator.findValidUser(userEmail);
 
         if (!post.getAuthor().getEmail().equals(userEmail)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 수정할 수 있습니다.");
         }
 
-        String title = request.getTitle();
-        String content = request.getContent();
-        String postImage = request.getPostImage();
+        if (request.getTitle() != null && !request.getTitle().trim().isEmpty()) {
+            post.setTitle(request.getTitle().trim());
+        }
 
-        validatePostContent(title, content);
+        if (request.getContent() != null && !request.getContent().trim().isEmpty()) {
+            post.setContent(request.getContent().trim());
+        }
 
-        post.setTitle(title.trim());
-        post.setContent(content);
-        post.setPostImage(postImage);
+        if (request.getPostImage() != null && !request.getPostImage().isBlank()) {
+            post.setPostImage(request.getPostImage());
+        }
+
+        validatePostContent(post.getTitle(), post.getContent());
 
         return post;
     }
 
      public void deletePost(Long postId, String userEmail) {
         Post post = getPostById(postId);
+        userValidator.findValidUser(userEmail);
 
         if (!post.getAuthor().getEmail().equals(userEmail)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 삭제할 수 있습니다.");

@@ -23,7 +23,7 @@ public class Post {
 
     @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now(); // 2021-01-01 00:00:00 형태
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     private int likeCount;
     private int viewCount;

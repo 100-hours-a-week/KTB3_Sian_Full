@@ -41,17 +41,17 @@ public class CommentService {
         return comment;
     }
 
-    // 댓글 목록 조회 + 페이징
     public Page<CommentResponse> getCommentsByPost(Long postId, String userEmail, int page, int size, String sortField, String direction) {
 
         List<Comment> allComments = commentRepository.findByPostId(postId);
 
-            Comparator<Comment> comparator = switch (sortField) {
-            case "createdAt" -> Comparator.comparing(Comment::getCreatedAt);
-            default -> Comparator.comparing(Comment::getId);
-        };
+        Comparator<Comment> comparator = Comparator.comparing(Comment::getId);
 
-        if (direction.equalsIgnoreCase("desc")) {
+        if ("createdAt".equalsIgnoreCase(sortField)) {
+            comparator = Comparator.comparing(Comment::getCreatedAt);
+        }
+
+        if ("desc".equalsIgnoreCase(direction)) {
             comparator = comparator.reversed();
         }
 
@@ -68,7 +68,7 @@ public class CommentService {
 
     public Comment updateComment(Long commentId, String userEmail, String newContent) {
 
-        userValidator.findValidUser(userEmail); // 탈퇴 여부 검사
+        userValidator.findValidUser(userEmail);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."));
 

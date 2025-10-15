@@ -26,7 +26,6 @@ public class LikeService {
 
     public void addLike(Long postId, String userEmail) {
         Post post = getPostById(postId);
-
         User user = userValidator.findValidUser(userEmail);
 
         if (likeRepository.hasUserLiked(postId, user.getId())) {

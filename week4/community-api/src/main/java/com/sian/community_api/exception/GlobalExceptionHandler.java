@@ -1,6 +1,5 @@
 package com.sian.community_api.exception;
 
-import com.sian.community_api.dto.common.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -56,6 +55,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    // 커스텀 예외
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
         ErrorResponse response = ErrorResponse.builder()

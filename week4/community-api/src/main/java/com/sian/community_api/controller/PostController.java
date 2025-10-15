@@ -69,21 +69,18 @@ public class PostController {
         return ApiResponse.created(PostDetailResponse.from(createdPost,userEmail));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ApiResponse<PostDetailResponse> updatePost(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable("id") Long postId,
             @RequestBody PostUpdateRequest request
     ) {
         String userEmail = authUtil.extractEmail(authHeader);
-
         Post updatedPost = postService.updatePost(postId, userEmail, request);
-
         return ApiResponse.ok(PostDetailResponse.from(updatedPost, userEmail));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ApiResponse<Void> deletePost(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable("id") Long postId

@@ -8,13 +8,17 @@ import com.sian.community_api.dto.Comment.CommentResponse;
 import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.service.CommentService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/posts/{postId}/comments")
 @RequiredArgsConstructor
+@Validated
 public class CommentController {
 
     private final CommentService commentService;
@@ -24,11 +28,12 @@ public class CommentController {
     public ApiResponse<CommentPageResponse> getComments(
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Long postId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Positive int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort
     ) {
         String userEmail = authUtill.extractEmail(authHeader);
+
         String[] sortParams = sort.split(",");
         String sortField = sortParams[0];
         String direction = sortParams.length > 1 ? sortParams[1] : "desc";
@@ -36,7 +41,7 @@ public class CommentController {
         Page<CommentResponse> commentPage = commentService.getCommentsByPost(postId, userEmail, page, size, sortField, direction);
         CommentPageResponse response = CommentPageResponse.from(commentPage);
 
-        return ApiResponse.success(200, "fetch_comments_success", response);
+        return ApiResponse.ok(response);
     }
 
     @PostMapping
@@ -46,16 +51,13 @@ public class CommentController {
             @Valid @RequestBody CommentRequest request
     ) {
         String userEmail = authUtill.extractEmail(authHeader);
-
         Comment comment = commentService.createComment(postId, userEmail, request.getContent());
-
         return ApiResponse.created(CommentResponse.from(comment, userEmail));
     }
 
     @PutMapping("/{commentId}")
     public ApiResponse<CommentResponse> updateComment(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable Long postId,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentRequest request
     ) {

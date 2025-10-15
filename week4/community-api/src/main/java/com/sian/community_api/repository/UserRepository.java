@@ -16,7 +16,7 @@ public class UserRepository extends BaseRepository<User> {
 
         if (store.isEmpty()) {
             save(new User(null, "sian@example.com", "sian", passwordEncoder.encode("Abcd1234!"), false, "profile1.jpeg"));
-            save(new User(null, "startup@example.com", "startup", passwordEncoder.encode("Asdf0000+"), false, "profile2.jpeg"));
+            save(new User(null, "startup@example.com", "startup", passwordEncoder.encode("Asdf0000!"), false, "profile2.jpeg"));
             save(new User(null, "spring@example.com", "spring", passwordEncoder.encode("Spring1!"), false, "profile3.png"));
         }
     }

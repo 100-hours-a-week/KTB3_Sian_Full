@@ -26,6 +26,11 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다."));
 
+        // 탈퇴한 사용자인지 확인
+        if (user.isDeleted()) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "DELETED_USER", "탈퇴한 회원의 접근입니다.");
+        }
+
         // 비밀번호 틀린 경우
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다.");

@@ -22,7 +22,7 @@ public class CommentController {
 
     @GetMapping
     public ApiResponse<CommentPageResponse> getComments(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Long postId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -67,7 +67,6 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     public ApiResponse<Void> deleteComment(
             @RequestHeader("Authorization") String authHeader,
-            @PathVariable Long postId,
             @PathVariable Long commentId
     ) {
         String userEmail = authUtill.extractEmail(authHeader);

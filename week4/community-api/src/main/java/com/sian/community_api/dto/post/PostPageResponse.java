@@ -12,9 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 public class PostPageResponse {
 
-    private List<PostSummaryResponse> content; // 게시글 목록
-    private int totalPages;       // 전체 페이지 수
-    private long totalElements;   // 전체 게시글 수
+    private List<PostSummaryResponse> content;
+    private int totalPages;
+    private long totalElements;
     private int size;             // 한 페이지당 최대 게시글 수
     private int number;           // 현재 페이지
     private boolean first;        // 첫 페이지 여부

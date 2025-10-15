@@ -18,27 +18,18 @@ public abstract class BaseRepository<T> {
         return model;
     }
 
-    // id로 조회
     public Optional<T> findById(Long id) {
         return Optional.ofNullable(store.get(id));
     }
 
-    // 전체 조회
     public List<T> findAll() {
         return new ArrayList<>(store.values());
-    }
-
-    // 초기화
-    public void clear() {
-        store.clear();
-        sequence = 0;
     }
 
     public void delete(Long id) {
         store.remove(id);
     }
 
-    // 각 레포지토리에서 정의
     protected abstract Long getId(T model);
     protected abstract void setId(T model, Long id);
 }

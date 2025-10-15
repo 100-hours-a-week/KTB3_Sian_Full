@@ -28,7 +28,6 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 토큰 발급
     public String generateToken(String email) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + EXPIRATION_TIME);
@@ -41,7 +40,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -58,7 +56,6 @@ public class JwtTokenProvider {
         return false;
     }
 
-    // 이메일 추출
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)

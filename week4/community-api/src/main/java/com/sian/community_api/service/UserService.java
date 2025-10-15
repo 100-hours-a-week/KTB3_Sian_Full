@@ -30,9 +30,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUser(String email, String newNickname, String newProfileImage) {
+    public User updateUser(Long userId, String newNickname, String newProfileImage) {
 
-        User user = userValidator.findValidUser(email);
+        User user = userValidator.findValidUserById(userId);
 
         if (newNickname != null && !newNickname.isBlank() && !newNickname.equals(user.getNickname())) {
             userRepository.findByNickname(newNickname).ifPresent(existing -> {
@@ -49,9 +49,9 @@ public class UserService {
     }
 
 
-    public void updatePassword(String email, String currentPassword, String newPassword, String newPasswordConfirm) {
+    public void updatePassword(Long userId, String currentPassword, String newPassword, String newPasswordConfirm) {
 
-        User user = userValidator.findValidUser(email);
+        User user = userValidator.findValidUserById(userId);
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_current", "현재 비밀번호가 일치하지 않습니다.");
@@ -68,8 +68,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
     }
 
-    public void deleteUser(String email) {
-        User user = userValidator.findValidUser(email);
+    public void deleteUser(Long userId) {
+        User user = userValidator.findValidUserById(userId);
         user.delete();
     }
 }

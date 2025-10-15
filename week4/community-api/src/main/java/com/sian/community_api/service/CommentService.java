@@ -23,9 +23,9 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserValidator userValidator;
 
-    public Comment createComment(Long postId, String email, String content) {
+    public Comment createComment(Long postId, Long userId, String content) {
 
-        User author = userValidator.findValidUser(email);
+        User author = userValidator.findValidUserById(userId);
 
         if (content == null || content.isBlank()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "INVALID_COMMENT", "댓글 내용을 입력해주세요.");
@@ -41,7 +41,7 @@ public class CommentService {
         return comment;
     }
 
-    public Page<CommentResponse> getCommentsByPost(Long postId, String userEmail, int page, int size, String sortField, String direction) {
+    public Page<CommentResponse> getCommentsByPost(Long postId, Long userId, int page, int size, String sortField, String direction) {
 
         List<Comment> allComments = commentRepository.findByPostId(postId);
 
@@ -60,19 +60,19 @@ public class CommentService {
         int start = page * size;
         int end = Math.min(start + size, allComments.size());
         List<CommentResponse> content = allComments.subList(start, end).stream()
-                .map(comment -> CommentResponse.from(comment, userEmail))
+                .map(comment -> CommentResponse.from(comment, userId))
                 .toList();
 
         return new PageImpl<>(content, PageRequest.of(page, size), allComments.size());
     }
 
-    public Comment updateComment(Long commentId, String userEmail, String newContent) {
+    public Comment updateComment(Long commentId, Long userId, String newContent) {
 
-        userValidator.findValidUser(userEmail);
+        userValidator.findValidUserById(userId);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."));
 
-        if (!comment.getAuthor().getEmail().equals(userEmail)) {
+        if (!comment.getAuthor().getId().equals(userId)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 댓글을 수정할 수 있습니다.");
         }
 
@@ -86,12 +86,12 @@ public class CommentService {
         return comment;
     }
 
-    public void deleteComment(Long commentId, String userEmail) {
-        userValidator.findValidUser(userEmail); // 탈퇴 여부 검사
+    public void deleteComment(Long commentId, Long userId) {
+        userValidator.findValidUserById(userId); // 탈퇴 여부 검사
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."));
 
-        if (!comment.getAuthor().getEmail().equals(userEmail)) {
+        if (!comment.getAuthor().getId().equals(userId)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 댓글을 삭제할 수 있습니다.");
         }
 

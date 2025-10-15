@@ -67,9 +67,9 @@ public class PostService {
         return new PageImpl<>(content, PageRequest.of(page, size), allPosts.size());
     }
 
-    public Post createPost(String userEmail, PostCreateRequest request) {
+    public Post createPost(Long userId, PostCreateRequest request) {
 
-        User author = userValidator.findValidUser(userEmail);
+        User author = userValidator.findValidUserById(userId);
         String title = request.getTitle();
         String content = request.getContent();
 
@@ -88,21 +88,28 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post updatePost(Long postId, String userEmail, PostUpdateRequest request) {
+    public Post updatePost(Long postId, Long userId, PostUpdateRequest request) {
         Post post = getPostById(postId);
-        userValidator.findValidUser(userEmail);
+        userValidator.findValidUserById(userId);
 
-        if (!post.getAuthor().getEmail().equals(userEmail)) {
+        if (!post.getAuthor().getId().equals(userId)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 수정할 수 있습니다.");
         }
 
-        if (request.getTitle() != null && !request.getTitle().trim().isEmpty()) {
-            post.setTitle(request.getTitle().trim());
+        if (request.getTitle() != null) {
+            if (request.getTitle().isBlank()) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_title", "제목을 입력해주세요.");
+            }
+            post.setTitle(request.getTitle());
         }
 
-        if (request.getContent() != null && !request.getContent().trim().isEmpty()) {
-            post.setContent(request.getContent().trim());
+        if (request.getContent() != null) {
+            if (request.getContent().isBlank()) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_content", "본문을 1자 이상 입력해주세요.");
+            }
+            post.setContent(request.getContent());
         }
+
 
         if (request.getPostImage() != null && !request.getPostImage().isBlank()) {
             post.setPostImage(request.getPostImage());
@@ -113,11 +120,11 @@ public class PostService {
         return post;
     }
 
-     public void deletePost(Long postId, String userEmail) {
+     public void deletePost(Long postId, Long userId) {
         Post post = getPostById(postId);
-        userValidator.findValidUser(userEmail);
+        userValidator.findValidUserById(userId);
 
-        if (!post.getAuthor().getEmail().equals(userEmail)) {
+        if (!post.getAuthor().getId().equals(userId)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 삭제할 수 있습니다.");
         }
 

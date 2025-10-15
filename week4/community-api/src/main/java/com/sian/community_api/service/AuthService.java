@@ -23,13 +23,13 @@ public class AuthService {
 
     public TokenResponse login(UserLoginRequest request) {
 
-        User user = userValidator.findValidUser(request.getEmail());
+        User user = userValidator.findValidUserByEmail(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getEmail());
+        String token = jwtTokenProvider.generateToken(user.getId());
         return new TokenResponse(token);
     }
 }

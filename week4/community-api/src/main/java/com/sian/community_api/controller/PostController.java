@@ -10,13 +10,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
@@ -45,17 +40,17 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ApiResponse<PostDetailResponse> getPostById(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long id) {
-        String email = null;
+        Long userId = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
-                email = authUtil.extractEmail(authHeader);
+                userId = authUtil.extractUserId(authHeader);
             } catch (Exception e) {
-                email = null;
+                userId = null;
             }
         }
         Post post = postService.getPostById(id);
-        PostDetailResponse response = PostDetailResponse.from(post, email);
+        PostDetailResponse response = PostDetailResponse.from(post, userId);
         return ApiResponse.ok(response);
     }
 
@@ -64,9 +59,9 @@ public class PostController {
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody PostCreateRequest request
     ) {
-        String userEmail = authUtil.extractEmail(authHeader);
-        Post createdPost = postService.createPost(userEmail, request);
-        return ApiResponse.created(PostDetailResponse.from(createdPost,userEmail));
+        Long userId = authUtil.extractUserId(authHeader);
+        Post createdPost = postService.createPost(userId, request);
+        return ApiResponse.created(PostDetailResponse.from(createdPost,userId));
     }
 
     @PatchMapping("/{id}")
@@ -75,9 +70,9 @@ public class PostController {
             @PathVariable("id") Long postId,
             @RequestBody PostUpdateRequest request
     ) {
-        String userEmail = authUtil.extractEmail(authHeader);
-        Post updatedPost = postService.updatePost(postId, userEmail, request);
-        return ApiResponse.ok(PostDetailResponse.from(updatedPost, userEmail));
+        Long userId = authUtil.extractUserId(authHeader);
+        Post updatedPost = postService.updatePost(postId, userId, request);
+        return ApiResponse.ok(PostDetailResponse.from(updatedPost, userId));
     }
 
     @DeleteMapping("/{id}")
@@ -85,8 +80,8 @@ public class PostController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable("id") Long postId
     ) {
-        String userEmail = authUtil.extractEmail(authHeader);
-        postService.deletePost(postId, userEmail);
+        Long userId = authUtil.extractUserId(authHeader);
+        postService.deletePost(postId, userId);
         return ApiResponse.success(200, "게시글이 삭제되었습니다.", null);
     }
 }

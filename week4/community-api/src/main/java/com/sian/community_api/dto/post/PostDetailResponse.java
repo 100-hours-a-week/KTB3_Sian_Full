@@ -25,9 +25,9 @@ public class PostDetailResponse {
     private String authorNickname;
     private String authorProfileImage;
 
-    public static PostDetailResponse from(Post post, String currentUserEmail) {
+    public static PostDetailResponse from(Post post, Long userId) {
 
-        boolean isAuthor = post.getAuthor().getEmail().equals(currentUserEmail);
+        boolean isAuthor = post.getAuthor().getId().equals(userId);
 
         return PostDetailResponse.builder()
                 .id(post.getId())

@@ -12,7 +12,7 @@ public class AuthUtil {
     private final JwtTokenProvider jwtTokenProvider;
 
     // 토큰 유효성 검증 및 이메일 추출
-    public String extractEmail(String authHeader) {
+    public Long extractUserId(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "missing_token", "토큰이 필요합니다.");
         }
@@ -23,6 +23,6 @@ public class AuthUtil {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_token", "토큰이 유효하지 않습니다.");
         }
 
-        return jwtTokenProvider.getEmailFromToken(token);
+        return jwtTokenProvider.getUserIdFromToken(token);
     }
 }

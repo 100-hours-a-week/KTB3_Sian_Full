@@ -24,9 +24,9 @@ public class LikeService {
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."));
     }
 
-    public void addLike(Long postId, String userEmail) {
+    public void addLike(Long postId, Long userId) {
         Post post = getPostById(postId);
-        User user = userValidator.findValidUser(userEmail);
+        User user = userValidator.findValidUserById(userId);
 
         if (likeRepository.hasUserLiked(postId, user.getId())) {
             throw new CustomException(HttpStatus.CONFLICT, "ALREADY_LIKED", "이미 좋아요를 누른 게시글입니다.");
@@ -38,10 +38,10 @@ public class LikeService {
         postRepository.save(post);
     }
 
-    public void removeLike(Long postId, String userEmail) {
+    public void removeLike(Long postId, Long userId) {
 
         Post post = getPostById(postId);
-        User user = userValidator.findValidUser(userEmail);
+        User user = userValidator.findValidUserById(userId);
 
         if (!likeRepository.hasUserLiked(postId, user.getId())) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "NOT_LIKED", "좋아요를 누르지 않은 게시글입니다.");

@@ -32,13 +32,20 @@ public class CommentController {
             @RequestParam(defaultValue = "10") @Positive int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort
     ) {
-        String userEmail = authUtill.extractEmail(authHeader);
+        Long userId = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                userId = authUtill.extractUserId(authHeader);
+            } catch (Exception ignored) {
+                userId = null;
+            }
+        }
 
         String[] sortParams = sort.split(",");
         String sortField = sortParams[0];
         String direction = sortParams.length > 1 ? sortParams[1] : "desc";
 
-        Page<CommentResponse> commentPage = commentService.getCommentsByPost(postId, userEmail, page, size, sortField, direction);
+        Page<CommentResponse> commentPage = commentService.getCommentsByPost(postId, userId, page, size, sortField, direction);
         CommentPageResponse response = CommentPageResponse.from(commentPage);
 
         return ApiResponse.ok(response);
@@ -50,9 +57,9 @@ public class CommentController {
             @PathVariable Long postId,
             @Valid @RequestBody CommentRequest request
     ) {
-        String userEmail = authUtill.extractEmail(authHeader);
-        Comment comment = commentService.createComment(postId, userEmail, request.getContent());
-        return ApiResponse.created(CommentResponse.from(comment, userEmail));
+        Long userId = authUtill.extractUserId(authHeader);
+        Comment comment = commentService.createComment(postId, userId, request.getContent());
+        return ApiResponse.created(CommentResponse.from(comment, userId));
     }
 
     @PutMapping("/{commentId}")
@@ -61,9 +68,9 @@ public class CommentController {
             @PathVariable Long commentId,
             @Valid @RequestBody CommentRequest request
     ) {
-        String userEmail = authUtill.extractEmail(authHeader);
-        Comment updated = commentService.updateComment(commentId, userEmail, request.getContent());
-        return ApiResponse.ok(CommentResponse.from(updated, userEmail));
+        Long userId = authUtill.extractUserId(authHeader);
+        Comment updated = commentService.updateComment(commentId, userId, request.getContent());
+        return ApiResponse.ok(CommentResponse.from(updated, userId));
     }
 
     @DeleteMapping("/{commentId}")
@@ -71,8 +78,8 @@ public class CommentController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable Long commentId
     ) {
-        String userEmail = authUtill.extractEmail(authHeader);
-        commentService.deleteComment(commentId, userEmail);
+        Long userId = authUtill.extractUserId(authHeader);
+        commentService.deleteComment(commentId, userId);
         return ApiResponse.success(200, "댓글이 성공적으로 삭제되었습니다.", null);
     }
 }

@@ -48,8 +48,8 @@ public class UserController {
     public ApiResponse<UserSignupResponse> getMyInfo(
             @RequestHeader(value = "Authorization") String authHeader) {
 
-        String email = authUtil.extractEmail(authHeader);
-        User user = userValidator.findValidUser(email);
+        Long userId = authUtil.extractUserId(authHeader);
+        User user = userValidator.findValidUserById(userId);
         return ApiResponse.ok(UserSignupResponse.from(user));
     }
 
@@ -58,10 +58,10 @@ public class UserController {
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody UserUpdateRequest request) {
 
-        String email = authUtil.extractEmail(authHeader);
+        Long userId = authUtil.extractUserId(authHeader);
 
         User updatedUser = userService.updateUser(
-                email,
+                userId,
                 request.getNickname(),
                 request.getProfileImage()
         );
@@ -72,15 +72,15 @@ public class UserController {
     @DeleteMapping("/me")
     public ApiResponse<Void> deleteUser(@RequestHeader("Authorization") String authHeader) {
 
-        String email = authUtil.extractEmail(authHeader);
-        userService.deleteUser(email);
+        Long userId = authUtil.extractUserId(authHeader);
+        userService.deleteUser(userId);
         return ApiResponse.success(200, "회원탈퇴가 완료되었습니다.", null);
     }
 
     @PatchMapping("/me/password")
     public ApiResponse<Void> updatePassword(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody UserPasswordUpdateRequest request ) {
-        String email = authUtil.extractEmail(authHeader);
-        userService.updatePassword(email,request.getCurrentPassword(), request.getNewPassword(), request.getNewPasswordConfirm());
+        Long userId = authUtil.extractUserId(authHeader);
+        userService.updatePassword(userId,request.getCurrentPassword(), request.getNewPassword(), request.getNewPasswordConfirm());
         return ApiResponse.success(200, "비밀번호가 성공적으로 변경되었습니다.", null);
     }
 }

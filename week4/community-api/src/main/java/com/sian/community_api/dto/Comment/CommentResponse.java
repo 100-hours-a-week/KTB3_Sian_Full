@@ -26,9 +26,9 @@ public class CommentResponse {
     private String authorProfileImage;
     private boolean isAuthor;
 
-    public static CommentResponse from(Comment comment, String currentUserEmail) {
+    public static CommentResponse from(Comment comment, Long userId) {
 
-        boolean isAuthor = comment.getAuthor().getEmail().equals(currentUserEmail);
+        boolean isAuthor = comment.getAuthor().getId().equals(userId);
 
         return CommentResponse.builder()
                 .id(comment.getId())

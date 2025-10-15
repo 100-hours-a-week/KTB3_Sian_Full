@@ -18,8 +18,8 @@ public class LikeController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable Long postId
     ) {
-        String userEmail = authUtil.extractEmail(authHeader);
-        likeService.addLike(postId, userEmail);
+        Long userId = authUtil.extractUserId(authHeader);
+        likeService.addLike(postId, userId);
         return ApiResponse.success(200, "like_added_success", null);
     }
 
@@ -28,8 +28,8 @@ public class LikeController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable Long postId
     ) {
-        String userEmail = authUtil.extractEmail(authHeader);
-        likeService.removeLike(postId, userEmail);
+        Long userId = authUtil.extractUserId(authHeader);
+        likeService.removeLike(postId, userId);
         return ApiResponse.success(200, "like_removed_success", null);
     }
 }

@@ -6,9 +6,12 @@ import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.post.*;
 import com.sian.community_api.service.PostService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,18 +21,17 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/posts")
 @AllArgsConstructor
+@Validated
 public class PostController {
 
     private final PostService postService;
     private final AuthUtil authUtil;
 
-    // 전체 게시글 목록 조회 (페이징 + 정렬)
-    // 기본 정렬 : 최신순
     @GetMapping
     public ApiResponse<PostPageResponse> getAllPosts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "created_at,desc") String sort
+            @RequestParam(defaultValue = "0") @Min(0) int page, // 현재 페이지
+            @RequestParam(defaultValue = "10") @Positive int size,
+            @RequestParam(defaultValue = "created_at,desc") String sort // 최신순
     ) {
         String[] sortParams = sort.split(",");
         String sortField = sortParams[0];
@@ -41,7 +43,6 @@ public class PostController {
         return ApiResponse.ok(response);
     }
 
-    // 게시글 상세 조회
     @GetMapping("/{id}")
     public ApiResponse<PostDetailResponse> getPostById(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long id) {
         String email = null;
@@ -50,7 +51,6 @@ public class PostController {
             try {
                 email = authUtil.extractEmail(authHeader);
             } catch (Exception e) {
-                // 유효하지 않은 토큰일경우 null 처리
                 email = null;
             }
         }

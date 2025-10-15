@@ -1,6 +1,7 @@
 package com.sian.community_api.controller;
 
 import com.sian.community_api.config.AuthUtil;
+import com.sian.community_api.dto.user.UserPasswordUpdateRequest;
 import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.dto.user.UserSignupResponse;
 import com.sian.community_api.dto.user.UserUpdateRequest;
@@ -85,5 +86,14 @@ public class UserController {
         userService.deleteUser(email);
 
         return ApiResponse.success(200, "회원탈퇴가 완료되었습니다.", null);
+    }
+
+    // 비밀번호 변경
+    @PatchMapping("/me/password")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> updatePassword(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody UserPasswordUpdateRequest request ) {
+        String email = authUtil.extractEmail(authHeader);
+        userService.updatePassword(email,request.getCurrentPassword(), request.getNewPassword(), request.getNewPasswordConfirm());
+        return ApiResponse.success(200, "비밀번호가 성공적으로 변경되었습니다.", null);
     }
 }

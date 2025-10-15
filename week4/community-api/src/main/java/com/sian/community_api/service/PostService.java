@@ -8,7 +8,7 @@ import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;

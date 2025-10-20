@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class MemoryUserRepository extends BaseRepository<User> implements UserRepository {
+public class UserRepositoryImpl extends BaseRepository<User> implements UserRepository {
     private final PasswordEncoder passwordEncoder;
 
-    public MemoryUserRepository(PasswordEncoder passwordEncoder) {
+    public UserRepositoryImpl(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
 
         if (store.isEmpty()) {

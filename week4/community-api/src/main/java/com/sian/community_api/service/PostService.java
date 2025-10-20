@@ -1,13 +1,13 @@
 package com.sian.community_api.service;
 
 import com.sian.community_api.config.UserValidator;
-import com.sian.community_api.domain.Post;
+import com.sian.community_api.domain.Post.Post;
 import com.sian.community_api.domain.User.User;
 import com.sian.community_api.dto.post.PostCreateRequest;
 import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.repository.PostRepository;
+import com.sian.community_api.domain.Post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

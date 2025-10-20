@@ -1,6 +1,7 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.Post;
+import com.sian.community_api.domain.Post.Post;
+import com.sian.community_api.domain.Post.PostRepository;
 import com.sian.community_api.domain.User.User;
 import com.sian.community_api.domain.User.UserRepository;
 import com.sian.community_api.exception.CustomException;
@@ -11,14 +12,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @AllArgsConstructor
-public class PostRepository extends BaseRepository<Post> {
+public class PostRepositoryImpl extends BaseRepository<Post> implements PostRepository {
 
     private final UserRepository userRepository;
 
     @PostConstruct
     public void init() {
         User sian = userRepository.findById(1L)
-                        .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "테스트 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "테스트 유저를 찾을 수 없습니다."));
 
         save(Post.builder()
                 .author(sian)
@@ -51,7 +52,6 @@ public class PostRepository extends BaseRepository<Post> {
                 .build());
     }
 
-
     @Override
     protected Long getId(Post model) {
         return model.getId();
@@ -62,3 +62,4 @@ public class PostRepository extends BaseRepository<Post> {
         model.setId(id);
     }
 }
+

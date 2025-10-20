@@ -1,13 +1,14 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.Like;
+import com.sian.community_api.domain.Like.Like;
+import com.sian.community_api.domain.Like.LikeRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class LikeRepository {
+public class LikeRepositoryImpl implements LikeRepository {
     private static final List<Like> store = new ArrayList<>();
 
     public boolean hasUserLiked(Long postId, Long userId) {

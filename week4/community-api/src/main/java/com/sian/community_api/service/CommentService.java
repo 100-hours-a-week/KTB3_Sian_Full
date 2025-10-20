@@ -2,7 +2,7 @@ package com.sian.community_api.service;
 
 import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.domain.Comment;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.domain.User.User;
 import com.sian.community_api.dto.Comment.CommentResponse;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.CommentRepository;

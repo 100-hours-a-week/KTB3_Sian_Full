@@ -1,17 +1,17 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.User;
+import com.sian.community_api.domain.User.User;
+import com.sian.community_api.domain.User.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.Optional;
 
 @Repository
-public class UserRepository extends BaseRepository<User> {
-
+public class MemoryUserRepository extends BaseRepository<User> implements UserRepository {
     private final PasswordEncoder passwordEncoder;
 
-    public UserRepository(PasswordEncoder passwordEncoder) {
+    public MemoryUserRepository(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
 
         if (store.isEmpty()) {
@@ -21,12 +21,14 @@ public class UserRepository extends BaseRepository<User> {
         }
     }
 
+    @Override
     public Optional<User> findByEmail(String email) {
         return store.values().stream()
                 .filter(user -> user.getEmail().equals(email))
                 .findFirst();
     }
 
+    @Override
     public Optional<User> findByNickname(String nickname) {
         return store.values().stream()
                 .filter(user -> user.getNickname().equals(nickname))

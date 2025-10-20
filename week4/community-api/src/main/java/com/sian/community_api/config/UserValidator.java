@@ -1,8 +1,8 @@
 package com.sian.community_api.config;
 
-import com.sian.community_api.domain.User;
+import com.sian.community_api.domain.User.User;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.repository.UserRepository;
+import com.sian.community_api.domain.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

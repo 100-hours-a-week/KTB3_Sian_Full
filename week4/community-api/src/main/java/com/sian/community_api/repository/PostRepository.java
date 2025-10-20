@@ -1,7 +1,8 @@
 package com.sian.community_api.repository;
 
 import com.sian.community_api.domain.Post;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.domain.User.User;
+import com.sian.community_api.domain.User.UserRepository;
 import com.sian.community_api.exception.CustomException;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;

@@ -3,16 +3,17 @@ package com.sian.community_api.repository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public abstract class BaseRepository<T> {
 
     protected final Map<Long, T> store = new LinkedHashMap<>();
-    protected long sequence = 0;
+    protected AtomicLong sequence = new AtomicLong();
 
     public T save(T model) {
         if (getId(model) == null) {
-            setId(model, ++sequence);
+            setId(model, sequence.incrementAndGet());
         }
         store.put(getId(model), model);
         return model;

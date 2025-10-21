@@ -1,6 +1,6 @@
 package com.sian.community_api.dto.user;
 
-import com.sian.community_api.domain.User.User;
+import com.sian.community_api.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 

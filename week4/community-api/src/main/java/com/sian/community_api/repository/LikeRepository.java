@@ -1,4 +1,6 @@
-package com.sian.community_api.domain.Like;
+package com.sian.community_api.repository;
+
+import com.sian.community_api.domain.Like;
 
 public interface LikeRepository {
     void save(Like like);

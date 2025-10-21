@@ -1,4 +1,6 @@
-package com.sian.community_api.domain.Post;
+package com.sian.community_api.repository;
+
+import com.sian.community_api.domain.Post;
 
 import java.util.List;
 import java.util.Optional;

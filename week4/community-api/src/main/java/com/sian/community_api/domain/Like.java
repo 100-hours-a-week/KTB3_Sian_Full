@@ -1,4 +1,4 @@
-package com.sian.community_api.domain.Like;
+package com.sian.community_api.domain;
 
 import lombok.*;
 

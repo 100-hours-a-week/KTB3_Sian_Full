@@ -1,7 +1,6 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.Comment.Comment;
-import com.sian.community_api.domain.Comment.CommentRepository;
+import com.sian.community_api.domain.Comment;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

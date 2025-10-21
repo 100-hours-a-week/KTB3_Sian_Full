@@ -1,7 +1,6 @@
-package com.sian.community_api.domain.Post;
+package com.sian.community_api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sian.community_api.domain.User.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

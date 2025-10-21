@@ -1,4 +1,6 @@
-package com.sian.community_api.domain.User;
+package com.sian.community_api.repository;
+
+import com.sian.community_api.domain.User;
 
 import java.util.*;
 

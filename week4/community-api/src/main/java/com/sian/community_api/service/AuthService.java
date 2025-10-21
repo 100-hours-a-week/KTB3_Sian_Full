@@ -5,8 +5,7 @@ import com.sian.community_api.dto.user.TokenResponse;
 import com.sian.community_api.dto.user.UserLoginRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.config.JwtTokenProvider;
-import com.sian.community_api.domain.User.User;
-import com.sian.community_api.domain.User.UserRepository;
+import com.sian.community_api.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserValidator userValidator;

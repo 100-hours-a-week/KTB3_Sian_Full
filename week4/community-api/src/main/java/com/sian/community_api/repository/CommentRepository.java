@@ -1,11 +1,9 @@
-package com.sian.community_api.domain.Comment;
+package com.sian.community_api.repository;
 
-import com.sian.community_api.repository.BaseRepository;
-import org.springframework.stereotype.Repository;
+import com.sian.community_api.domain.Comment;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public interface CommentRepository {
     Comment save(Comment comment);

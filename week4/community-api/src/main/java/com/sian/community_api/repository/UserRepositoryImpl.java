@@ -1,7 +1,6 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.User.User;
-import com.sian.community_api.domain.User.UserRepository;
+import com.sian.community_api.domain.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 

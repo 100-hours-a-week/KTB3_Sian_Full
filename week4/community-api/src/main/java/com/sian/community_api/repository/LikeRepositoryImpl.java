@@ -1,7 +1,6 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.Like.Like;
-import com.sian.community_api.domain.Like.LikeRepository;
+import com.sian.community_api.domain.Like;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;

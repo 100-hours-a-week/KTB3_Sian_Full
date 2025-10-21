@@ -1,7 +1,7 @@
 package com.sian.community_api.dto.Comment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sian.community_api.domain.Comment.Comment;
+import com.sian.community_api.domain.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

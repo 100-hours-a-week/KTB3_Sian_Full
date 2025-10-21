@@ -1,12 +1,12 @@
 package com.sian.community_api.service;
 
 import com.sian.community_api.config.UserValidator;
-import com.sian.community_api.domain.Like.Like;
-import com.sian.community_api.domain.Post.Post;
-import com.sian.community_api.domain.User.User;
+import com.sian.community_api.domain.Like;
+import com.sian.community_api.domain.Post;
+import com.sian.community_api.domain.User;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.domain.Like.LikeRepository;
-import com.sian.community_api.domain.Post.PostRepository;
+import com.sian.community_api.repository.LikeRepository;
+import com.sian.community_api.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

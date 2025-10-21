@@ -1,4 +1,4 @@
-package com.sian.community_api.domain.User;
+package com.sian.community_api.domain;
 import lombok.*;
 
 @Getter

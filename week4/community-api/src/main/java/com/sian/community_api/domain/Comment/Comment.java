@@ -1,4 +1,4 @@
-package com.sian.community_api.domain;
+package com.sian.community_api.domain.Comment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sian.community_api.domain.User.User;

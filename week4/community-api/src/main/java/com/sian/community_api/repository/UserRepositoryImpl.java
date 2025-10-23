@@ -14,9 +14,26 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
         this.passwordEncoder = passwordEncoder;
 
         if (store.isEmpty()) {
-            save(new User(null, "sian@example.com", "sian", passwordEncoder.encode("Abcd1234!"), false, "profile1.jpeg"));
-            save(new User(null, "startup@example.com", "startup", passwordEncoder.encode("Asdf0000!"), false, "profile2.jpeg"));
-            save(new User(null, "spring@example.com", "spring", passwordEncoder.encode("Spring1!"), false, "profile3.png"));
+            save(User.builder()
+                    .email("sian@example.com")
+                    .nickname("sian")
+                    .password(passwordEncoder.encode("Abcd1234!"))
+                    .profileImage("profile1.jpeg")
+                    .build());
+
+            save(User.builder()
+                    .email("startup@example.com")
+                    .nickname("startup")
+                    .password(passwordEncoder.encode("Asdf0000!"))
+                    .profileImage("profile2.jpeg")
+                    .build());
+
+            save(User.builder()
+                    .email("spring@example.com")
+                    .nickname("spring")
+                    .password(passwordEncoder.encode("Spring1!"))
+                    .profileImage("profile3.png")
+                    .build());
         }
     }
 
@@ -37,10 +54,5 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
     @Override
     protected Long getId(User user) {
         return user.getId();
-    }
-
-    @Override
-    protected  void setId(User user, Long id) {
-        user.setId(id);
     }
 }

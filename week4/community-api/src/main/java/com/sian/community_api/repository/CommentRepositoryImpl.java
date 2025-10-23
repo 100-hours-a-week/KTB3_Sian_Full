@@ -15,11 +15,6 @@ public class CommentRepositoryImpl extends BaseRepository<Comment> implements Co
     }
 
     @Override
-    protected void setId(Comment comment, Long id) {
-        comment.setId(id);
-    }
-
-    @Override
     public List<Comment> findByPostId(Long postId) {
         return store.values().stream()
                 .filter(comment -> comment.getPostId().equals(postId))

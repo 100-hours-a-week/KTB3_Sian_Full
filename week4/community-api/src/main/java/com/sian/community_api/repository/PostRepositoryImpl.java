@@ -55,9 +55,5 @@ public class PostRepositoryImpl extends BaseRepository<Post> implements PostRepo
         return model.getId();
     }
 
-    @Override
-    protected void setId(Post model, Long id) {
-        model.setId(id);
-    }
 }
 

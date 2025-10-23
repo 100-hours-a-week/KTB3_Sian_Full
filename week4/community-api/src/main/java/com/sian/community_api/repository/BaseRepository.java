@@ -12,9 +12,6 @@ public abstract class BaseRepository<T> {
     protected AtomicLong sequence = new AtomicLong();
 
     public T save(T model) {
-        if (getId(model) == null) {
-            setId(model, sequence.incrementAndGet());
-        }
         store.put(getId(model), model);
         return model;
     }
@@ -32,5 +29,4 @@ public abstract class BaseRepository<T> {
     }
 
     protected abstract Long getId(T model);
-    protected abstract void setId(T model, Long id);
 }

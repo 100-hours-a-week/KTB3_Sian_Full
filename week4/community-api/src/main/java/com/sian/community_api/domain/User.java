@@ -1,21 +1,29 @@
 package com.sian.community_api.domain;
 import lombok.*;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User {
     private Long id;
     private String email;
     private String nickname;
     private String password;
-    @Builder.Default
     private boolean isDeleted = false;
     private String profileImage;
 
-    public void setId(Long id) {
-        this.id = id;
+    private static final AtomicLong sequence = new AtomicLong(0);
+
+    @Builder
+    public User(String email, String nickname, String password, String profileImage) {
+        this.id = sequence.incrementAndGet();
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.profileImage = profileImage;
+        this.isDeleted = false;
     }
 
     public void delete() {

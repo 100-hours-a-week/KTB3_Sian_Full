@@ -3,9 +3,7 @@ package com.sian.community_api.repository;
 import com.sian.community_api.domain.Like;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Repository

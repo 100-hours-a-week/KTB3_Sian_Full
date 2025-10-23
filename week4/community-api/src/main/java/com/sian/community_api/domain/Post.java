@@ -29,19 +29,15 @@ public class Post {
     @Builder.Default
     private int commentCount = 0;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setTitle(String title) {
+    public void updateTitle(String title) {
         this.title = title;
     }
 
-    public void setContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
     }
 
-    public void setPostImage(String postImage) {
+    public void updatePostImage(String postImage) {
         this.postImage = postImage;
     }
 

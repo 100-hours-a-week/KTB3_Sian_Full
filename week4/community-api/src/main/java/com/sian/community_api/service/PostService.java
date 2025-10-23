@@ -100,19 +100,19 @@ public class PostService {
             if (request.getTitle().isBlank()) {
                 throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_title", "제목을 입력해주세요.");
             }
-            post.setTitle(request.getTitle());
+            post.updateTitle(request.getTitle());
         }
 
         if (request.getContent() != null) {
             if (request.getContent().isBlank()) {
                 throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_content", "본문을 1자 이상 입력해주세요.");
             }
-            post.setContent(request.getContent());
+            post.updateContent(request.getContent());
         }
 
 
         if (request.getPostImage() != null && !request.getPostImage().isBlank()) {
-            post.setPostImage(request.getPostImage());
+            post.updatePostImage(request.getPostImage());
         }
 
         validatePostContent(post.getTitle(), post.getContent());

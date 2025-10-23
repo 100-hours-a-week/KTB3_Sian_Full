@@ -22,10 +22,6 @@ public class Comment {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void updateContent(String content) {
         this.content = content;
     }

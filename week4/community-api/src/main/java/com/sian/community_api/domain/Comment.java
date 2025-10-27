@@ -11,8 +11,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Comment {
     private Long id;
     private Long postId;

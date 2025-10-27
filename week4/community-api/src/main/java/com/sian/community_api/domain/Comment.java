@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 @NoArgsConstructor
@@ -17,10 +18,18 @@ public class Comment {
     private Long postId;
     private User author;
     private String content;
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private static final AtomicLong sequence = new AtomicLong(0);
+
+    @Builder
+    public Comment(Long postId, User author, String content) {
+        this.id = sequence.incrementAndGet();
+        this.postId = postId;
+        this.author = author;
+        this.content = content;
+    }
 
     public void updateContent(String content) {
         this.content = content;

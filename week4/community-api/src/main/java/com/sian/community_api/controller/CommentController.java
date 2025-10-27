@@ -34,11 +34,7 @@ public class CommentController {
     ) {
         Long userId = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            try {
-                userId = authUtill.extractUserId(authHeader);
-            } catch (Exception ignored) {
-                userId = null;
-            }
+            userId = authUtill.extractUserId(authHeader);
         }
 
         String[] sortParams = sort.split(",");

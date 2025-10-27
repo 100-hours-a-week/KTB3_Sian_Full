@@ -7,27 +7,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Post {
     private Long id;
     private User author;
     private String title;
     private String content;
     private String postImage;
-
-    @Builder.Default
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+    private Integer likeCount;
+    private Integer viewCount;
+    private Integer commentCount;
 
-    private int likeCount;
-    private int viewCount;
+    private static final AtomicLong sequence = new AtomicLong(0);
 
-    @Builder.Default
-    private int commentCount = 0;
+    @Builder
+    public Post(User author, String title, String content, String postImage, Integer likeCount, Integer viewCount, Integer commentCount) {
+        this.id = sequence.incrementAndGet();
+        this.author = author;
+        this.title = title;
+        this.content = content;
+        this.createdAt = LocalDateTime.now();
+        this.likeCount = (likeCount != null) ? likeCount : 0;
+        this.viewCount = (viewCount != null) ? viewCount : 0;
+        this.commentCount = (commentCount != null) ? commentCount : 0;
+        if(postImage != null) { this.postImage = postImage; }
+    }
 
     public void updateTitle(String title) {
         this.title = title;

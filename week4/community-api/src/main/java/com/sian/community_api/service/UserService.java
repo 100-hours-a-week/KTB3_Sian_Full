@@ -1,6 +1,7 @@
 package com.sian.community_api.service;
 
 import com.sian.community_api.config.UserValidator;
+import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.repository.UserRepository;
@@ -16,15 +17,25 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
 
-    public User createUser(User user) {
+    public User createUser(UserSignupRequest request) {
+        if (!request.isPasswordConfirmed()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 일치하지 않습니다.");
+        }
 
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new CustomException(HttpStatus.CONFLICT, "duplicate_email", "이미 사용 중인 이메일입니다.");
         }
 
-        if (userRepository.findByNickname(user.getNickname()).isPresent()) {
+        if (userRepository.findByNickname(request.getNickname()).isPresent()) {
             throw new CustomException(HttpStatus.CONFLICT,"duplicate_nickname", "이미 사용 중인 닉네임입니다.");
         }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(request.getNickname())
+                .profileImage(request.getProfileImage())
+                .build();
 
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);

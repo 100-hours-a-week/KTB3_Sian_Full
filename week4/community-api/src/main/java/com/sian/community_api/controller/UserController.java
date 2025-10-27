@@ -27,18 +27,7 @@ public class UserController {
     @PostMapping
     public ApiResponse<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest request) {
 
-        if (!request.isPasswordConfirmed()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 일치하지 않습니다.");
-        }
-
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .nickname(request.getNickname())
-                .profileImage(request.getProfileImage())
-                .build();
-
-        User created = userService.createUser(user);
+        User created = userService.createUser(request);
         UserSignupResponse response = UserSignupResponse.from(created);
 
         return ApiResponse.created(response);

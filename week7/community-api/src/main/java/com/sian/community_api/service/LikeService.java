@@ -1,5 +1,6 @@
 package com.sian.community_api.service;
 
+import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.domain.Like;
 import com.sian.community_api.domain.Post;
@@ -18,21 +19,22 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final UserValidator userValidator;
-
-    private Post getPostById(Long id) {
-        return postRepository.findById(id)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."));
-    }
+    private final PostValidator postValidator;
 
     public void addLike(Long postId, Long userId) {
-        Post post = getPostById(postId);
+        Post post = postValidator.findValidPostById(postId);
         User user = userValidator.findValidUserById(userId);
 
-        if (likeRepository.hasUserLiked(postId, user.getId())) {
+        if (likeRepository.existsByPostIdAndUserId(user, post)) {
             throw new CustomException(HttpStatus.CONFLICT, "ALREADY_LIKED", "이미 좋아요를 누른 게시글입니다.");
         }
 
-        likeRepository.save(new Like(user.getId(), postId));
+        Like like = Like.builder()
+                .user(user)
+                .post(post)
+                .build();
+
+        likeRepository.save(like);
 
         post.incrementLike();
         postRepository.save(post);
@@ -40,14 +42,14 @@ public class LikeService {
 
     public void removeLike(Long postId, Long userId) {
 
-        Post post = getPostById(postId);
+        Post post = postValidator.findValidPostById(postId);
         User user = userValidator.findValidUserById(userId);
 
-        if (!likeRepository.hasUserLiked(postId, user.getId())) {
+        if (!likeRepository.existsByPostIdAndUserId(user, post)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "NOT_LIKED", "좋아요를 누르지 않은 게시글입니다.");
         }
 
-        likeRepository.delete(postId, user.getId());
+        likeRepository.deleteByPostIdAndUserId(user, post);
         post.decrementLike();
         postRepository.save(post);
     }

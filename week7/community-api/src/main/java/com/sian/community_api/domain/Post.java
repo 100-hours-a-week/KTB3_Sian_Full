@@ -1,18 +1,21 @@
 package com.sian.community_api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicLong;
 
+@Entity
+@Table(name = "posts")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class Post {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User author;
     private String title;
     private String content;
@@ -23,11 +26,8 @@ public class Post {
     private Integer viewCount;
     private Integer commentCount;
 
-    private static final AtomicLong sequence = new AtomicLong(0);
-
     @Builder
     public Post(User author, String title, String content, String postImage, Integer likeCount, Integer viewCount, Integer commentCount) {
-        this.id = sequence.incrementAndGet();
         this.author = author;
         this.title = title;
         this.content = content;
@@ -56,5 +56,9 @@ public class Post {
 
     public void decrementLike() {
         if (this.likeCount > 0 ) this.likeCount--;
+    }
+
+    public void incrementViewCount() {
+        this.viewCount++;
     }
 }

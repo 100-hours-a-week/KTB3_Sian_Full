@@ -7,9 +7,9 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "users")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

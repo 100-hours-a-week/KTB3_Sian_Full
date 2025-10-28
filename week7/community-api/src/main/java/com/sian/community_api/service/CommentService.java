@@ -1,7 +1,9 @@
 package com.sian.community_api.service;
 
+import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.domain.Comment;
+import com.sian.community_api.domain.Post;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.dto.Comment.CommentResponse;
 import com.sian.community_api.exception.CustomException;
@@ -22,9 +24,10 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserValidator userValidator;
+    private final PostValidator postValidator;
 
     public Comment createComment(Long postId, Long userId, String content) {
-
+        Post post = postValidator.findValidPostById(postId);
         User author = userValidator.findValidUserById(userId);
 
         if (content == null || content.isBlank()) {
@@ -32,7 +35,7 @@ public class CommentService {
         }
 
         Comment comment = Comment.builder()
-                .postId(postId)
+                .post(post)
                 .author(author)
                 .content(content.trim())
                 .build();
@@ -95,7 +98,12 @@ public class CommentService {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 댓글을 삭제할 수 있습니다.");
         }
 
-        commentRepository.delete(commentId);
+        commentRepository.delete(comment);
+    }
+
+    // 게시글 삭제시 댓글도 삭제
+    public void deleteCommentsByPost(Long postId) {
+        commentRepository.deleteByPostId(postId);
     }
 
 }

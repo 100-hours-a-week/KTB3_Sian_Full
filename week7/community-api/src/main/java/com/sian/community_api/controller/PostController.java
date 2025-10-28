@@ -1,6 +1,7 @@
 package com.sian.community_api.controller;
 
 import com.sian.community_api.config.AuthUtil;
+import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.domain.Post;
 import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.post.*;
@@ -21,6 +22,7 @@ public class PostController {
 
     private final PostService postService;
     private final AuthUtil authUtil;
+    private final PostValidator postValidator;
 
     @GetMapping
     public ApiResponse<PostPageResponse> getAllPosts(
@@ -38,8 +40,8 @@ public class PostController {
         return ApiResponse.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<PostDetailResponse> getPostById(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long id) {
+    @GetMapping("/{postId}")
+    public ApiResponse<PostDetailResponse> getPostById(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long postId) {
         Long userId = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -49,8 +51,8 @@ public class PostController {
                 userId = null;
             }
         }
-        Post post = postService.getPostById(id);
-        PostDetailResponse response = PostDetailResponse.from(post, userId);
+        Post post = postValidator.findValidPostById(postId);
+        PostDetailResponse response = postService.getPostDetail(postId, userId);
         return ApiResponse.ok(response);
     }
 

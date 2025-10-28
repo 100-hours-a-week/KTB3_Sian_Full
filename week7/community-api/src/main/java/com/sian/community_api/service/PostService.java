@@ -1,9 +1,11 @@
 package com.sian.community_api.service;
 
+import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.domain.Post;
 import com.sian.community_api.domain.User;
 import com.sian.community_api.dto.post.PostCreateRequest;
+import com.sian.community_api.dto.post.PostDetailResponse;
 import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
@@ -25,11 +27,8 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserValidator userValidator;
-
-    public Post getPostById(Long id) {
-        return postRepository.findById(id)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "해당 게시글을 찾을 수 없습니다."));
-    }
+    private final PostValidator postValidator;
+    private final CommentService commentService;
 
     private void validatePostContent(String title, String content) {
         if ((title == null || title.isBlank()) || (content == null || content.isBlank())) {
@@ -89,7 +88,7 @@ public class PostService {
     }
 
     public Post updatePost(Long postId, Long userId, PostUpdateRequest request) {
-        Post post = getPostById(postId);
+        Post post = postValidator.findValidPostById(postId);
         userValidator.findValidUserById(userId);
 
         if (!post.getAuthor().getId().equals(userId)) {
@@ -120,14 +119,23 @@ public class PostService {
         return post;
     }
 
+    public PostDetailResponse getPostDetail(Long postId, Long userId) {
+        Post post = postValidator.findValidPostById(postId);
+
+        post.incrementViewCount();
+        postRepository.save(post);
+
+        return PostDetailResponse.from(post, userId);
+    }
+
      public void deletePost(Long postId, Long userId) {
-        Post post = getPostById(postId);
+        Post post = postValidator.findValidPostById(postId);
         userValidator.findValidUserById(userId);
 
         if (!post.getAuthor().getId().equals(userId)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 삭제할 수 있습니다.");
         }
-
-        postRepository.delete(postId);
+        commentService.deleteCommentsByPost(postId);
+        postRepository.delete(post);
     }
 }

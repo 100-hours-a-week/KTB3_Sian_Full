@@ -30,24 +30,6 @@
 
 ---
 
-## 📁 Project Structure
-
-community-api
-┣ 📂 controller # Controller layer (API endpoint)
-┣ 📂 service # Business logic
-┣ 📂 repository # JPA repositories
-┣ 📂 entity # JPA entities (User, Post, Comment, Like)
-┣ 📂 validator # Entity validation utilities
-┣ 📂 auth # JWT provider, token util classes
-┣ 📂 common # ApiResponse, global exception handler
-┣ 📜 CommunityApiApplication.java
-┗ 📜 build.gradle
-
-markdown
-코드 복사
-
----
-
 ## 🧩 Features
 
 ### 👤 User

@@ -1,4 +1,4 @@
-package com.sian.community_api.domain;
+package com.sian.community_api.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -32,9 +32,9 @@ public class Post {
         this.title = title;
         this.content = content;
         this.createdAt = LocalDateTime.now();
-        this.likeCount = (likeCount != null) ? likeCount : 0;
-        this.viewCount = (viewCount != null) ? viewCount : 0;
-        this.commentCount = (commentCount != null) ? commentCount : 0;
+        this.likeCount = 0;
+        this.viewCount = 0;
+        this.commentCount = 0;
         if(postImage != null) { this.postImage = postImage; }
     }
 
@@ -60,5 +60,13 @@ public class Post {
 
     public void incrementViewCount() {
         this.viewCount++;
+    }
+
+    public void incrementCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decrementCommentCount() {
+        this.commentCount--;
     }
 }

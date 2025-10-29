@@ -1,6 +1,6 @@
 package com.sian.community_api.repository;
 
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.*;

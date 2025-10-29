@@ -6,12 +6,10 @@ import com.sian.community_api.dto.user.UserPasswordUpdateRequest;
 import com.sian.community_api.dto.user.UserSignupRequest;
 import com.sian.community_api.dto.user.UserSignupResponse;
 import com.sian.community_api.dto.user.UserUpdateRequest;
-import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.User;
 import com.sian.community_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import com.sian.community_api.dto.common.ApiResponse;
 

@@ -1,7 +1,7 @@
 package com.sian.community_api.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sian.community_api.domain.Post;
+import com.sian.community_api.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 

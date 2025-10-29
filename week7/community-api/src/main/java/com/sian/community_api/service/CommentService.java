@@ -2,9 +2,9 @@ package com.sian.community_api.service;
 
 import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.config.UserValidator;
-import com.sian.community_api.domain.Comment;
-import com.sian.community_api.domain.Post;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.Comment;
+import com.sian.community_api.entity.Post;
+import com.sian.community_api.entity.User;
 import com.sian.community_api.dto.Comment.CommentResponse;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.CommentRepository;
@@ -14,12 +14,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -41,9 +43,11 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+        post.incrementCommentCount();
         return comment;
     }
 
+    @Transactional(readOnly = true)
     public Page<CommentResponse> getCommentsByPost(Long postId, Long userId, int page, int size, String sortField, String direction) {
 
         List<Comment> allComments = commentRepository.findByPostId(postId);
@@ -98,10 +102,13 @@ public class CommentService {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 댓글을 삭제할 수 있습니다.");
         }
 
+        Post post = comment.getPost();
+        post.decrementCommentCount();
+
         commentRepository.delete(comment);
+
     }
 
-    // 게시글 삭제시 댓글도 삭제
     public void deleteCommentsByPost(Long postId) {
         commentRepository.deleteByPostId(postId);
     }

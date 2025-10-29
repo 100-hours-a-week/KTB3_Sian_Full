@@ -2,8 +2,8 @@ package com.sian.community_api.service;
 
 import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.config.UserValidator;
-import com.sian.community_api.domain.Post;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.Post;
+import com.sian.community_api.entity.User;
 import com.sian.community_api.dto.post.PostCreateRequest;
 import com.sian.community_api.dto.post.PostDetailResponse;
 import com.sian.community_api.dto.post.PostSummaryResponse;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.Comparator;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostService {
 
     private final PostRepository postRepository;
@@ -40,6 +42,7 @@ public class PostService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Page<PostSummaryResponse> getPagedPosts(int page, int size, String sortField, String direction) {
         List<Post> allPosts = postRepository.findAll();
 
@@ -119,6 +122,7 @@ public class PostService {
         return post;
     }
 
+    @Transactional
     public PostDetailResponse getPostDetail(Long postId, Long userId) {
         Post post = postValidator.findValidPostById(postId);
 
@@ -128,7 +132,7 @@ public class PostService {
         return PostDetailResponse.from(post, userId);
     }
 
-     public void deletePost(Long postId, Long userId) {
+    public void deletePost(Long postId, Long userId) {
         Post post = postValidator.findValidPostById(postId);
         userValidator.findValidUserById(userId);
 

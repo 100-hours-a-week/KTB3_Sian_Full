@@ -1,6 +1,6 @@
 package com.sian.community_api.config;
 
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.User;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

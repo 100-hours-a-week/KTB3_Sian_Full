@@ -5,11 +5,13 @@ import com.sian.community_api.dto.user.TokenResponse;
 import com.sian.community_api.dto.user.UserLoginRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.config.JwtTokenProvider;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,8 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
 
+
+    @Transactional(readOnly = true)
     public TokenResponse login(UserLoginRequest request) {
 
         User user = userValidator.findValidUserByEmail(request.getEmail());

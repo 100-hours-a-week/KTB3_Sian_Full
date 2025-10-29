@@ -1,14 +1,12 @@
-package com.sian.community_api.domain;
+package com.sian.community_api.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Entity
 @Table (name = "comments")
@@ -27,8 +25,6 @@ public class Comment {
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    private static final AtomicLong sequence = new AtomicLong(0);
 
     @Builder
     public Comment(Post post, User author, String content) {

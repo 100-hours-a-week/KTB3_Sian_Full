@@ -1,4 +1,4 @@
-package com.sian.community_api.domain;
+package com.sian.community_api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

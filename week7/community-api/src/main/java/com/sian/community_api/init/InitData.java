@@ -1,7 +1,7 @@
 package com.sian.community_api.init;
 
-import com.sian.community_api.domain.Post;
-import com.sian.community_api.domain.User;
+import com.sian.community_api.entity.Post;
+import com.sian.community_api.entity.User;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
 import com.sian.community_api.repository.UserRepository;

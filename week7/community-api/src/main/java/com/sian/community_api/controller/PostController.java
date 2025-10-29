@@ -2,7 +2,7 @@ package com.sian.community_api.controller;
 
 import com.sian.community_api.config.AuthUtil;
 import com.sian.community_api.config.PostValidator;
-import com.sian.community_api.domain.Post;
+import com.sian.community_api.entity.Post;
 import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.post.*;
 import com.sian.community_api.service.PostService;

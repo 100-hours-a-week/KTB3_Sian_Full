@@ -1,6 +1,6 @@
 package com.sian.community_api.config;
 
-import com.sian.community_api.domain.Post;
+import com.sian.community_api.entity.Post;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
 import lombok.RequiredArgsConstructor;

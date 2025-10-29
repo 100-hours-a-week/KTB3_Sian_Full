@@ -1,7 +1,7 @@
 package com.sian.community_api.dto.Comment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sian.community_api.domain.Comment;
+import com.sian.community_api.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,7 +32,6 @@ public class CommentResponse {
 
         return CommentResponse.builder()
                 .id(comment.getId())
-                .postId(comment.getPostId())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .authorNickname(comment.getAuthor().getNickname())

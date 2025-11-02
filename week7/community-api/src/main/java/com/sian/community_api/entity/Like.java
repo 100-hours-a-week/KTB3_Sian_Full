@@ -11,9 +11,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SequenceGenerator(name = "like_seq_generator", sequenceName = "like_seq", allocationSize = 1)
 public class Like {
     @Id
-    @GeneratedValue (strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "like_seq_generator")
     private Long id;
 
     @ManyToOne // 한 명의 유저는 여러 개의 좋아요

@@ -18,6 +18,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
+    private final RefreshToken
 
     public TokenResponse login(UserLoginRequest request) {
 
@@ -27,7 +28,7 @@ public class AuthService {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getId());
+        String token = jwtTokenProvider.generateAccessToken(user.getId());
         return new TokenResponse(token);
     }
 }

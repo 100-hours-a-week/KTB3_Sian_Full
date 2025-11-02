@@ -6,9 +6,10 @@ import lombok.*;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
+@SequenceGenerator(name = "user_seq_generator", sequenceName = "user_seq", allocationSize = 1)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_generator")
     private Long id;
     private String email;
     private String nickname;

@@ -15,7 +15,8 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private static final long EXPIRATION_TIME = Duration.ofHours(12).toMillis();
+    private static final long ACCESS_TOKEN_EXP = Duration.ofHours(12).toMillis();
+    private static final long REFRESH_TOKEN_EXP = Duration.ofDays(7).toMillis();
 
     @Value("${jwt.secret}") // application.properties
     private String secretKeyBase64;
@@ -28,9 +29,21 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(Long userId) {
+    public String generateAccessToken(Long userId) {
         Date now = new Date();
-        Date exp = new Date(now.getTime() + EXPIRATION_TIME);
+        Date exp = new Date(now.getTime() + ACCESS_TOKEN_EXP);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(now)
+                .setExpiration(exp)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(Long userId) {
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + REFRESH_TOKEN_EXP);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))

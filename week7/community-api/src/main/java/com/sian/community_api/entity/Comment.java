@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @Table (name = "comments")
 @Getter
 @NoArgsConstructor
+@SequenceGenerator(name = "comment_seq_generator", sequenceName = "comment_seq", allocationSize = 1)
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comment_seq_generator")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)

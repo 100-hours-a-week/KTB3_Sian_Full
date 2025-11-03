@@ -1,4 +1,4 @@
-package com.sian.community_api.service;
+package com.sian.community_api.service.post;
 
 import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.config.UserValidator;
@@ -10,6 +10,8 @@ import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.repository.PostRepository;
+import com.sian.community_api.service.CommentService;
+import com.sian.community_api.service.post.sort.PostSortStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,19 +34,23 @@ public class PostService {
     private final UserValidator userValidator;
     private final PostValidator postValidator;
     private final CommentService commentService;
+    private final Map<String, PostSortStrategy> sortStrategies;
 
     @Transactional(readOnly = true)
     public Page<PostSummaryResponse> getPagedPosts(int page, int size, String sortField, String direction) {
         List<Post> allPosts = postRepository.findAll();
 
-        Comparator<Post> comparator;
-        switch (sortField) {
-            case "likes" -> comparator = Comparator.comparing(Post::getLikeCount);
-            case "views" -> comparator = Comparator.comparing(Post::getViewCount);
-            default -> comparator = Comparator.comparing(Post::getCreatedAt);
+        PostSortStrategy strategy = sortStrategies.getOrDefault(
+                sortField,
+                sortStrategies.get("createdAt")
+        );
+
+        Comparator<Post> comparator = strategy.getComparator();
+
+        if (direction.equalsIgnoreCase("desc")) {
+            comparator = comparator.reversed();
         }
 
-        if (direction.equalsIgnoreCase("desc")) comparator = comparator.reversed();
         allPosts.sort(comparator);
 
         int start = page * size;

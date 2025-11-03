@@ -5,7 +5,7 @@ import com.sian.community_api.config.PostValidator;
 import com.sian.community_api.entity.Post;
 import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.post.*;
-import com.sian.community_api.service.PostService;
+import com.sian.community_api.service.post.PostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;

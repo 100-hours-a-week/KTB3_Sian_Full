@@ -11,6 +11,7 @@ import com.sian.community_api.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ import java.util.Optional;
 public class AuthService {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
     private final RefreshTokenRepository refreshTokenRepository;
 

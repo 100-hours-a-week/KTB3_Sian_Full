@@ -17,11 +17,11 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "like_seq_generator")
     private Long id;
 
-    @ManyToOne // 한 명의 유저는 여러 개의 좋아요
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne // 하나의 게시글은 여러 개의 좋아요
+    @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 }

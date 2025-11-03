@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,7 +27,23 @@ public class UserService {
             throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 일치하지 않습니다.");
         }
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        Optional<User> existingUserOpt = userRepository.findByEmail(request.getEmail());
+
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+
+            // 탈퇴 회원 재활성화
+            if (existingUser.isDeleted()) {
+                if (request.getNickname() != null && !request.getNickname().isBlank()) {
+                    existingUser.updateNickname(request.getNickname());
+                }
+
+                existingUser.updatePassword(passwordEncoder.encode(request.getPassword()));
+
+                existingUser.restore();
+
+                return existingUser;
+            }
             throw new CustomException(HttpStatus.CONFLICT, "duplicate_email", "이미 사용 중인 이메일입니다.");
         }
 

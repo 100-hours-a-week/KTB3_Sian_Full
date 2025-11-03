@@ -32,16 +32,6 @@ public class PostService {
     private final PostValidator postValidator;
     private final CommentService commentService;
 
-    private void validatePostContent(String title, String content) {
-        if ((title == null || title.isBlank()) || (content == null || content.isBlank())) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목과 내용을 모두 작성해주세요.");
-        }
-
-        if (title != null && title.length() > 26) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_input_value", "제목은 최대 26자까지 작성 가능합니다.");
-        }
-    }
-
     @Transactional(readOnly = true)
     public Page<PostSummaryResponse> getPagedPosts(int page, int size, String sortField, String direction) {
         List<Post> allPosts = postRepository.findAll();
@@ -75,7 +65,7 @@ public class PostService {
         String title = request.getTitle();
         String content = request.getContent();
 
-        validatePostContent(title, content);
+        postValidator.validateContent(title, content);
 
         Post post = Post.builder()
                 .author(author)
@@ -117,7 +107,7 @@ public class PostService {
             post.updatePostImage(request.getPostImage());
         }
 
-        validatePostContent(post.getTitle(), post.getContent());
+        postValidator.validateContent(post.getTitle(), post.getContent());
 
         return post;
     }

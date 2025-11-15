@@ -4,6 +4,7 @@ import com.sian.community_api.config.AuthUtil;
 import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.user.TokenResponse;
 import com.sian.community_api.dto.user.UserLoginRequest;
+import com.sian.community_api.dto.user.UserLoginResponse;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.service.AuthService;
 import jakarta.validation.Valid;
@@ -22,9 +23,9 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<TokenResponse> login(@Valid @RequestBody UserLoginRequest request) {
+    public ApiResponse<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest request) {
 
-        TokenResponse response = authService.login(request);
+        UserLoginResponse response = authService.login(request);
         return ApiResponse.ok(response);
     }
 

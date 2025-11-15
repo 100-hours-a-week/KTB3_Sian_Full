@@ -10,8 +10,10 @@ import com.sian.community_api.entity.User;
 import com.sian.community_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import com.sian.community_api.dto.common.ApiResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/users")
@@ -40,18 +42,15 @@ public class UserController {
         return ApiResponse.ok(UserSignupResponse.from(user));
     }
 
-    @PatchMapping("/me")
+    @PatchMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UserSignupResponse> updateUserInfo(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody UserUpdateRequest request) {
-
+            @RequestPart("nickname") String nickname,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
         Long userId = authUtil.extractUserId(authHeader);
 
-        User updatedUser = userService.updateUser(
-                userId,
-                request.getNickname(),
-                request.getProfileImage()
-        );
+        User updatedUser = userService.updateUser(userId, nickname, image);
 
         return ApiResponse.ok(UserSignupResponse.from(updatedUser));
     }
@@ -67,7 +66,7 @@ public class UserController {
     @PatchMapping("/me/password")
     public ApiResponse<Void> updatePassword(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody UserPasswordUpdateRequest request ) {
         Long userId = authUtil.extractUserId(authHeader);
-        userService.updatePassword(userId,request.getCurrentPassword(), request.getNewPassword(), request.getNewPasswordConfirm());
+        userService.updatePassword(userId, request.getNewPassword(), request.getNewPasswordConfirm());
         return ApiResponse.success(200, "비밀번호가 성공적으로 변경되었습니다.", null);
     }
 }

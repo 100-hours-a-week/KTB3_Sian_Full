@@ -9,8 +9,10 @@ import com.sian.community_api.dto.post.PostDetailResponse;
 import com.sian.community_api.dto.post.PostSummaryResponse;
 import com.sian.community_api.dto.post.PostUpdateRequest;
 import com.sian.community_api.exception.CustomException;
+import com.sian.community_api.repository.LikeRepository;
 import com.sian.community_api.repository.PostRepository;
 import com.sian.community_api.service.CommentService;
+import com.sian.community_api.service.FileStorageService;
 import com.sian.community_api.service.post.sort.PostSortStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.Comparator;
@@ -33,8 +36,10 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserValidator userValidator;
     private final PostValidator postValidator;
-    private final CommentService commentService;
     private final Map<String, PostSortStrategy> sortStrategies;
+    private final FileStorageService fileStorageService;
+    private final LikeRepository likeRepository;
+    private final CommentService commentService;
 
     @Transactional(readOnly = true)
     public Page<PostSummaryResponse> getPagedPosts(int page, int size, String sortField, String direction) {
@@ -66,19 +71,22 @@ public class PostService {
         return new PageImpl<>(content, PageRequest.of(page, size), allPosts.size());
     }
 
-    public Post createPost(Long userId, PostCreateRequest request) {
+    public Post createPost(Long userId, String title, String content, MultipartFile image) {
 
         User author = userValidator.findValidUserById(userId);
-        String title = request.getTitle();
-        String content = request.getContent();
 
         postValidator.validateContent(title, content);
+
+        String imagePath = null;
+        if (image != null && !image.isEmpty()) {
+            imagePath = fileStorageService.save(image); // 예: /uploads/posts/123.png
+        }
 
         Post post = Post.builder()
                 .author(author)
                 .title(title != null ? title.trim() : null)
                 .content(content)
-                .postImage(request.getPostImage())
+                .postImage(imagePath)
                 .likeCount(0)
                 .viewCount(0)
                 .commentCount(0)
@@ -87,7 +95,10 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Post updatePost(Long postId, Long userId, PostUpdateRequest request) {
+
+    @Transactional
+    public Post updatePost(Long postId, Long userId, String title, String content, MultipartFile image) {
+
         Post post = postValidator.findValidPostById(postId);
         userValidator.findValidUserById(userId);
 
@@ -95,23 +106,23 @@ public class PostService {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 수정할 수 있습니다.");
         }
 
-        if (request.getTitle() != null) {
-            if (request.getTitle().isBlank()) {
+        if (title != null) {
+            if (title.isBlank()) {
                 throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_title", "제목을 입력해주세요.");
             }
-            post.updateTitle(request.getTitle());
+            post.updateTitle(title.trim());
         }
 
-        if (request.getContent() != null) {
-            if (request.getContent().isBlank()) {
+        if (content != null) {
+            if (content.isBlank()) {
                 throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_content", "본문을 1자 이상 입력해주세요.");
             }
-            post.updateContent(request.getContent());
+            post.updateContent(content);
         }
 
-
-        if (request.getPostImage() != null && !request.getPostImage().isBlank()) {
-            post.updatePostImage(request.getPostImage());
+        if (image != null && !image.isEmpty()) {
+            String imagePath = fileStorageService.save(image); // /uploads/...
+            post.updatePostImage(imagePath);
         }
 
         postValidator.validateContent(post.getTitle(), post.getContent());
@@ -119,16 +130,25 @@ public class PostService {
         return post;
     }
 
+
     @Transactional
     public PostDetailResponse getPostDetail(Long postId, Long userId) {
+
         Post post = postValidator.findValidPostById(postId);
 
         post.incrementViewCount();
         postRepository.save(post);
 
-        return PostDetailResponse.from(post, userId);
+        boolean liked = false;
+        if (userId != null) {
+            User user = userValidator.findValidUserById(userId);
+            liked = likeRepository.existsByPostAndUser(post, user);
+        }
+
+        return PostDetailResponse.from(post, userId, liked);
     }
 
+    @Transactional
     public void deletePost(Long postId, Long userId) {
         Post post = postValidator.findValidPostById(postId);
         userValidator.findValidUserById(userId);
@@ -136,7 +156,9 @@ public class PostService {
         if (!post.getAuthor().getId().equals(userId)) {
             throw new CustomException(HttpStatus.FORBIDDEN, "FORBIDDEN", "작성자만 게시글을 삭제할 수 있습니다.");
         }
+
         commentService.deleteCommentsByPost(postId);
         postRepository.delete(post);
     }
+
 }

@@ -3,6 +3,7 @@ package com.sian.community_api.service;
 import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.dto.user.TokenResponse;
 import com.sian.community_api.dto.user.UserLoginRequest;
+import com.sian.community_api.dto.user.UserLoginResponse;
 import com.sian.community_api.entity.RefreshToken;
 import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.config.JwtTokenProvider;
@@ -30,7 +31,7 @@ public class AuthService {
     private final UserValidator userValidator;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public TokenResponse login(UserLoginRequest request) {
+    public UserLoginResponse login(UserLoginRequest request) {
 
         User user = userValidator.findValidUserByEmail(request.getEmail());
 
@@ -56,7 +57,7 @@ public class AuthService {
             );
         }
 
-        return new TokenResponse(accessToken, refreshToken);
+        return UserLoginResponse.of(user, accessToken, refreshToken);
     }
 
     public void logout(Long userId) {

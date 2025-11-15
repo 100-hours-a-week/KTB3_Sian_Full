@@ -19,9 +19,6 @@ public class UserSignupRequest {
     )
     private String password;
 
-    @NotBlank (message = "비밀번호를 한번 더 입력해주세요.")
-    private String passwordConfirm;
-
     @NotBlank (message = "닉네임을 입력해주세요.")
     @Size (max = 10, message = "닉네임은 최대 10자까지 작성 가능합니다.")
     @Pattern(
@@ -30,11 +27,5 @@ public class UserSignupRequest {
     )
     private String nickname;
 
-    @NotBlank (message = "프로필 사진을 추가해주세요.")
     private String profileImage;
-
-    public boolean isPasswordConfirmed() {
-        return password != null && password.equals(passwordConfirm);
-    }
-
 }

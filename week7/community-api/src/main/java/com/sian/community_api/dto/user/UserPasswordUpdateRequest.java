@@ -7,9 +7,6 @@ import lombok.Getter;
 @Getter
 public class UserPasswordUpdateRequest {
 
-    @NotBlank(message = "현재 비밀번호를 입력해주세요.")
-    private String currentPassword;
-
     @NotBlank(message = "새 비밀번호를 입력해주세요.")
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9\\s]).{8,20}$",

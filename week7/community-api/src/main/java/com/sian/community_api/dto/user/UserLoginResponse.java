@@ -6,20 +6,24 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserSignupResponse {
+public class UserLoginResponse {
+    private String accessToken;
+    private String refreshToken;
     private Long id;
     private String email;
     private String nickname;
     private String profileImageUrl;
 
-    public static UserSignupResponse from(User user) {
+    public static UserLoginResponse of(User user, String accessToken, String refreshToken) {
 
         String fullUrl = null;
         if (user.getProfileImage() != null) {
             fullUrl = "http://localhost:8080" + user.getProfileImage();
         }
 
-        return UserSignupResponse.builder()
+        return UserLoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
@@ -27,3 +31,4 @@ public class UserSignupResponse {
                 .build();
     }
 }
+

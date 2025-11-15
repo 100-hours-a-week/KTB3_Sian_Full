@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -21,11 +22,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
+    private final FileStorageService fileStorageService;
 
     public User createUser(UserSignupRequest request) {
-        if (!request.isPasswordConfirmed()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "password_mismatch", "비밀번호가 일치하지 않습니다.");
-        }
 
         Optional<User> existingUserOpt = userRepository.findByEmail(request.getEmail());
 
@@ -61,34 +60,30 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User updateUser(Long userId, String newNickname, String newProfileImage) {
+    public User updateUser(Long userId, String nickname, MultipartFile image) {
 
         User user = userValidator.findValidUserById(userId);
 
-        if (newNickname != null && !newNickname.isBlank() && !newNickname.equals(user.getNickname())) {
-            userRepository.findByNickname(newNickname).ifPresent(existing -> {
-                throw new CustomException(HttpStatus.CONFLICT, "duplicate_nickname", "이미 사용 중인 닉네임입니다.");
-            });
-            user.updateNickname(newNickname);
+        if (nickname != null && !nickname.isBlank()) {
+            user.updateNickname(nickname);
         }
 
-        if (newProfileImage != null && !newProfileImage.isBlank() && !newProfileImage.equals(user.getProfileImage())) {
-            user.updateProfileImage(newProfileImage);
+        if (image != null && !image.isEmpty()) {
+            String savedPath = fileStorageService.save(image);
+            user.updateProfileImage(savedPath);
         }
 
         return user;
     }
 
 
-    public void updatePassword(Long userId, String currentPassword, String newPassword, String newPasswordConfirm) {
+
+
+    public void updatePassword(Long userId, String newPassword, String newPasswordConfirm) {
 
         User user = userValidator.findValidUserById(userId);
 
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "invalid_current", "현재 비밀번호가 일치하지 않습니다.");
-        }
-
-        if (currentPassword.equals(newPassword)) {
+        if (user.getPassword().equals(newPassword)) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "same_password", "새 비밀번호는 기존 비밀번호와 달라야 합니다.");
         }
 

@@ -23,15 +23,22 @@ public class PostSummaryResponse {
     private String authorProfileImage;
 
     public static PostSummaryResponse from(Post post) {
+
+        String profileUrl = null;
+        if (post.getAuthor().getProfileImage() != null) {
+            profileUrl = "http://localhost:8080" + post.getAuthor().getProfileImage();
+        }
+
         return PostSummaryResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .likeCount(post.getLikeCount())
-                .commentCount(post.getCommentCount())
                 .viewCount(post.getViewCount())
+                .commentCount(post.getCommentCount())
                 .createdAt(post.getCreatedAt())
                 .authorNickname(post.getAuthor().getNickname())
-                .authorProfileImage(post.getAuthor().getProfileImage())
+                .authorProfileImage(profileUrl)
                 .build();
     }
+
 }

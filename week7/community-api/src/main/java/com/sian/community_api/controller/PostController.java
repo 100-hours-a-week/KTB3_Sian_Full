@@ -2,17 +2,22 @@ package com.sian.community_api.controller;
 
 import com.sian.community_api.config.AuthUtil;
 import com.sian.community_api.config.PostValidator;
+import com.sian.community_api.config.UserValidator;
 import com.sian.community_api.entity.Post;
 import com.sian.community_api.dto.common.ApiResponse;
 import com.sian.community_api.dto.post.*;
+import com.sian.community_api.entity.User;
+import com.sian.community_api.repository.LikeRepository;
 import com.sian.community_api.service.post.PostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/posts")
@@ -22,7 +27,9 @@ public class PostController {
 
     private final PostService postService;
     private final AuthUtil authUtil;
+    private final LikeRepository likeRepository;
     private final PostValidator postValidator;
+    private final UserValidator userValidator;
 
     @GetMapping
     public ApiResponse<PostPageResponse> getAllPosts(
@@ -41,39 +48,56 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ApiResponse<PostDetailResponse> getPostById(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Long postId) {
+    public ApiResponse<PostDetailResponse> getPostById(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Long postId
+    ) {
         Long userId = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
                 userId = authUtil.extractUserId(authHeader);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 userId = null;
             }
         }
-        Post post = postValidator.findValidPostById(postId);
+
         PostDetailResponse response = postService.getPostDetail(postId, userId);
+
         return ApiResponse.ok(response);
     }
 
-    @PostMapping
+
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PostDetailResponse> createPost(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody PostCreateRequest request
+            @RequestPart("title") String title,
+            @RequestPart("content") String content,
+            @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         Long userId = authUtil.extractUserId(authHeader);
-        Post createdPost = postService.createPost(userId, request);
-        return ApiResponse.created(PostDetailResponse.from(createdPost,userId));
+
+        Post createdPost = postService.createPost(userId, title, content, image);
+
+        return ApiResponse.created(
+                PostDetailResponse.from(createdPost, userId, false)
+        );
     }
 
-    @PatchMapping("/{id}")
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<PostDetailResponse> updatePost(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable("id") Long postId,
-            @RequestBody PostUpdateRequest request
+            @RequestPart("title") String title,
+            @RequestPart("content") String content,
+            @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         Long userId = authUtil.extractUserId(authHeader);
-        Post updatedPost = postService.updatePost(postId, userId, request);
+
+        Post updatedPost = postService.updatePost(postId, userId, title, content, image);
+
         return ApiResponse.ok(PostDetailResponse.from(updatedPost, userId));
     }
 

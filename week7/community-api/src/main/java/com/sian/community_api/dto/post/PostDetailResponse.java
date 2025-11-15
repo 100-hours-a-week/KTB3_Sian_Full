@@ -13,11 +13,12 @@ public class PostDetailResponse {
     private Long id;
     private String title;
     private String content;
-    private String postImage;
+    private String postImageUrl;
     private int likeCount;
     private int viewCount;
     private int commentCount;
     private boolean isAuthor;
+    private boolean liked;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
@@ -26,22 +27,36 @@ public class PostDetailResponse {
     private String authorProfileImage;
 
     public static PostDetailResponse from(Post post, Long userId) {
+        return from(post, userId, false);
+    }
 
-        boolean isAuthor = post.getAuthor().getId().equals(userId);
+    public static PostDetailResponse from(Post post, Long userId, boolean liked) {
+
+        boolean isAuthor = userId != null && post.getAuthor().getId().equals(userId);
+
+        String fullImageUrl = null;
+        if (post.getPostImage() != null) {
+            fullImageUrl = "http://localhost:8080" + post.getPostImage();
+        }
+
+        String authorProfileUrl = null;
+        if (post.getAuthor().getProfileImage() != null) {
+            authorProfileUrl = "http://localhost:8080" + post.getAuthor().getProfileImage();
+        }
 
         return PostDetailResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .postImage(post.getPostImage())
+                .postImageUrl(fullImageUrl)
                 .likeCount(post.getLikeCount())
                 .viewCount(post.getViewCount())
                 .commentCount(post.getCommentCount())
                 .createdAt(post.getCreatedAt())
                 .authorNickname(post.getAuthor().getNickname())
-                .authorProfileImage(post.getAuthor().getProfileImage())
+                .authorProfileImage(authorProfileUrl)
                 .isAuthor(isAuthor)
+                .liked(liked)
                 .build();
     }
-
 }

@@ -15,6 +15,7 @@ public class User {
     private String nickname;
     private String password;
     private boolean isDeleted = false;
+
     private String profileImage;
 
     @Builder

@@ -3,6 +3,7 @@ package com.sian.community_api.dto.post;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @NoArgsConstructor
@@ -12,5 +13,5 @@ public class PostCreateRequest {
     private String title;
 
     private String content;
-    private String postImage;
+    private MultipartFile postImage;
 }

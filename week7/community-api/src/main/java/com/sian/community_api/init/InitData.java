@@ -24,7 +24,7 @@ public class InitData {
                 .email("sian@example.com")
                 .nickname("sian")
                 .password(passwordEncoder.encode("Abcd1234!"))
-                .profileImage("static/profile1.jpeg")
+                .profileImage(null)
                 .build());
 
         userRepository.save(User.builder()

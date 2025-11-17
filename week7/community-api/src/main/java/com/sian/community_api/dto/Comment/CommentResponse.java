@@ -30,13 +30,19 @@ public class CommentResponse {
 
         boolean isAuthor = comment.getAuthor().getId().equals(userId);
 
+        String authorProfileUrl = null;
+        if (comment.getAuthor().getProfileImage() != null) {
+            authorProfileUrl = "http://localhost:8080" + comment.getAuthor().getProfileImage();
+        }
+
         return CommentResponse.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .authorNickname(comment.getAuthor().getNickname())
-                .authorProfileImage(comment.getAuthor().getProfileImage())
+                .authorProfileImage(authorProfileUrl)
                 .isAuthor(isAuthor)
                 .build();
     }
+
 }

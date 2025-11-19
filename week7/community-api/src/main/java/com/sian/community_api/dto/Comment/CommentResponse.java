@@ -1,6 +1,7 @@
 package com.sian.community_api.dto.Comment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sian.community_api.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class CommentResponse {
 
     private String authorNickname;
     private String authorProfileImage;
+    @JsonProperty("isAuthor")
     private boolean isAuthor;
 
     public static CommentResponse from(Comment comment, Long userId) {

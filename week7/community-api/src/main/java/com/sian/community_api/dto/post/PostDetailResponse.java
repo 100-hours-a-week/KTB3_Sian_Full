@@ -1,6 +1,7 @@
 package com.sian.community_api.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sian.community_api.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class PostDetailResponse {
     private int likeCount;
     private int viewCount;
     private int commentCount;
+    @JsonProperty("isAuthor")
     private boolean isAuthor;
     private boolean liked;
 

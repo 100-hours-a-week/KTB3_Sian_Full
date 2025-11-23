@@ -24,10 +24,15 @@ public class UserController {
     private final AuthUtil authUtil;
     private final UserValidator userValidator;
 
-    @PostMapping
-    public ApiResponse<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest request) {
+    @PostMapping (consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<UserSignupResponse> signup(
+            @RequestPart("email") String email,
+            @RequestPart("password") String password,
+            @RequestPart("nickname") String nickname,
+            @RequestPart(value = "image", required = false) MultipartFile image
+            ) {
 
-        User created = userService.createUser(request);
+        User created = userService.createUser(email, password, nickname, image);
         UserSignupResponse response = UserSignupResponse.from(created);
 
         return ApiResponse.created(response);
@@ -46,11 +51,12 @@ public class UserController {
     public ApiResponse<UserSignupResponse> updateUserInfo(
             @RequestHeader("Authorization") String authHeader,
             @RequestPart("nickname") String nickname,
-            @RequestPart(value = "image", required = false) MultipartFile image
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "profileDeleted", required = false) String profileDeleted
     ) {
         Long userId = authUtil.extractUserId(authHeader);
 
-        User updatedUser = userService.updateUser(userId, nickname, image);
+        User updatedUser = userService.updateUser(userId, nickname, image, profileDeleted);
 
         return ApiResponse.ok(UserSignupResponse.from(updatedUser));
     }

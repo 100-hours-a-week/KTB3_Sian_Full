@@ -43,4 +43,16 @@ public class FileStorageService {
         return "/uploads/" + fileName;
     }
 
+    public void delete(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank()) return;
+
+        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+        File file = new File(uploadDir, fileName);
+
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
 }

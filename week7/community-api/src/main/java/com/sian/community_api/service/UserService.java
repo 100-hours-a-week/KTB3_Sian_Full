@@ -24,43 +24,49 @@ public class UserService {
     private final UserValidator userValidator;
     private final FileStorageService fileStorageService;
 
-    public User createUser(UserSignupRequest request) {
+    public User createUser(String email, String password, String nickname, MultipartFile image) {
 
-        Optional<User> existingUserOpt = userRepository.findByEmail(request.getEmail());
-
+        // 이메일 중복 체크
+        Optional<User> existingUserOpt = userRepository.findByEmail(email);
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
 
             // 탈퇴 회원 재활성화
             if (existingUser.isDeleted()) {
-                if (request.getNickname() != null && !request.getNickname().isBlank()) {
-                    existingUser.updateNickname(request.getNickname());
+                if (nickname != null && !nickname.isBlank()) {
+                    existingUser.updateNickname(nickname);
                 }
-
-                existingUser.updatePassword(passwordEncoder.encode(request.getPassword()));
-
+                existingUser.updatePassword(passwordEncoder.encode(password));
                 existingUser.restore();
-
                 return existingUser;
             }
             throw new CustomException(HttpStatus.CONFLICT, "duplicate_email", "이미 사용 중인 이메일입니다.");
         }
 
-        if (userRepository.findByNickname(request.getNickname()).isPresent()) {
+        // 중복 닉네임 체크
+        if (userRepository.findByNickname(nickname).isPresent()) {
             throw new CustomException(HttpStatus.CONFLICT,"duplicate_nickname", "이미 사용 중인 닉네임입니다.");
         }
 
         User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(request.getNickname())
-                .profileImage(request.getProfileImage())
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .nickname(nickname)
+                .profileImage(null)
                 .build();
+
+        // 이미지 업로드
+        if (image != null && !image.isEmpty()) {
+            String savedPath = fileStorageService.save(image);
+            user.updateProfileImage(savedPath);
+        } else {
+            user.updateProfileImage(null);
+        }
 
         return userRepository.save(user);
     }
 
-    public User updateUser(Long userId, String nickname, MultipartFile image) {
+    public User updateUser(Long userId, String nickname, MultipartFile image, String profileDeleted) {
 
         User user = userValidator.findValidUserById(userId);
 
@@ -68,7 +74,16 @@ public class UserService {
             user.updateNickname(nickname);
         }
 
+        // 프로필 삭제
+        if ("true".equals(profileDeleted)) {
+            deleteOldImageFile(user.getProfileImage());
+            user.updateProfileImage(null);
+            return user;
+        }
+
+        // 프로필 수정
         if (image != null && !image.isEmpty()) {
+            deleteOldImageFile(user.getProfileImage());
             String savedPath = fileStorageService.save(image);
             user.updateProfileImage(savedPath);
         }
@@ -97,5 +112,11 @@ public class UserService {
     public void deleteUser(Long userId) {
         User user = userValidator.findValidUserById(userId);
         user.delete();
+    }
+
+    private void deleteOldImageFile(String oldImagePath) {
+        if (oldImagePath == null || oldImagePath.isBlank()) return;
+
+        fileStorageService.delete(oldImagePath);
     }
 }

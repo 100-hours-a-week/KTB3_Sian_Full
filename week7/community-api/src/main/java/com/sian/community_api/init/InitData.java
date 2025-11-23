@@ -23,22 +23,8 @@ public class InitData {
         userRepository.save(User.builder()
                 .email("sian@example.com")
                 .nickname("sian")
-                .password(passwordEncoder.encode("Abcd1234!"))
+                .password(passwordEncoder.encode("Tyui7245+"))
                 .profileImage(null)
-                .build());
-
-        userRepository.save(User.builder()
-                .email("startup@example.com")
-                .nickname("startup")
-                .password(passwordEncoder.encode("Asdf0000!"))
-                .profileImage("static/profile2.jpeg")
-                .build());
-
-        userRepository.save(User.builder()
-                .email("spring@example.com")
-                .nickname("spring")
-                .password(passwordEncoder.encode("Spring1!"))
-                .profileImage("static/profile3.png")
                 .build());
 
         User sian = userRepository.findById(1L)

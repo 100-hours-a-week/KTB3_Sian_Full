@@ -11,7 +11,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_generator")
     private Long id;
+    @Column(unique = true)
     private String email;
+    @Column(unique = true)
     private String nickname;
     private String password;
     private boolean isDeleted = false;

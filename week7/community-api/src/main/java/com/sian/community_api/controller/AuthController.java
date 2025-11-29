@@ -1,56 +1,110 @@
 package com.sian.community_api.controller;
 
-import com.sian.community_api.config.AuthUtil;
 import com.sian.community_api.dto.common.ApiResponse;
+import com.sian.community_api.dto.user.LoginTokens;
 import com.sian.community_api.dto.user.TokenResponse;
 import com.sian.community_api.dto.user.UserLoginRequest;
 import com.sian.community_api.dto.user.UserLoginResponse;
-import com.sian.community_api.exception.CustomException;
 import com.sian.community_api.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
-    private final AuthUtil authUtil;
 
+    /**
+     * 로그인
+     * AccessToken → JSON
+     * RefreshToken → HttpOnly Cookie
+     */
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest request) {
+    public ApiResponse<UserLoginResponse> login(
+            @Valid @RequestBody UserLoginRequest request,
+            HttpServletResponse response
+    ) {
+        LoginTokens tokens = authService.login(request);
 
-        UserLoginResponse response = authService.login(request);
-        return ApiResponse.ok(response);
+        // === Refresh Token 쿠키 저장 ===
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(false) // dev= false / prod= true
+                .sameSite("None")
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) // 7일
+                .build();
+
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        // AccessToken은 JSON으로 반환
+        return ApiResponse.ok(UserLoginResponse.of(tokens.getUser(), tokens.getAccessToken()));
     }
 
+
+    /**
+     * 로그아웃
+     * - DB의 refreshToken 제거
+     * - 쿠키에서도 refreshToken 삭제
+     */
     @PostMapping("/logout")
     public ApiResponse<Void> logout(
-            @RequestHeader("Authorization") String authHeader
+            Authentication authentication,
+            HttpServletResponse response
     ) {
-        Long userId = authUtil.extractUserId(authHeader);
+        Long userId = Long.valueOf(authentication.getName());
         authService.logout(userId);
+
+        // === RefreshToken 삭제 ===
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader("Set-Cookie", deleteCookie.toString());
+
         return ApiResponse.ok(null);
     }
 
-    @PostMapping("/refresh")
-    public ApiResponse<TokenResponse> refresh(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
 
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw new CustomException(
-                    HttpStatus.BAD_REQUEST,
-                    "missing_refresh_token",
-                    "리프레시 토큰이 필요합니다."
-            );
+    /**
+     * AccessToken 재발급
+     * RefreshToken은 쿠키에서 자동으로 가져옴
+     */
+    @PostMapping("/refresh")
+    public ApiResponse<TokenResponse> refresh(
+            @CookieValue(value = "refreshToken", required = false) String oldRefreshToken,
+            HttpServletResponse response
+    ) {
+        // === RefreshToken 쿠키 없음 ===
+        if (oldRefreshToken == null) {
+            return ApiResponse.error(401, "리프레시 토큰이 없습니다.");
         }
 
-        TokenResponse newTokens = authService.reissue(refreshToken);
-        return ApiResponse.ok(newTokens);
+        LoginTokens newTokens = authService.reissue(oldRefreshToken);
+
+        // === RefreshToken 새로 갱신 ===
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newTokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("None")
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
+
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        // AccessToken은 JSON으로 내려줌
+        return ApiResponse.ok(new TokenResponse(newTokens.getAccessToken()));
     }
+
 }

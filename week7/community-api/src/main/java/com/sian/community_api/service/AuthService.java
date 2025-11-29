@@ -1,24 +1,18 @@
 package com.sian.community_api.service;
 
 import com.sian.community_api.config.UserValidator;
-import com.sian.community_api.dto.user.TokenResponse;
+import com.sian.community_api.dto.user.LoginTokens;
 import com.sian.community_api.dto.user.UserLoginRequest;
-import com.sian.community_api.dto.user.UserLoginResponse;
 import com.sian.community_api.entity.RefreshToken;
 import com.sian.community_api.exception.CustomException;
-import com.sian.community_api.config.JwtTokenProvider;
 import com.sian.community_api.entity.User;
+import com.sian.community_api.jwt.TokenProvider;
 import com.sian.community_api.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Ref;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 
 @Service
@@ -26,12 +20,12 @@ import java.util.Optional;
 @Transactional
 public class AuthService {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public UserLoginResponse login(UserLoginRequest request) {
+    public LoginTokens login(UserLoginRequest request) {
 
         User user = userValidator.findValidUserByEmail(request.getEmail());
 
@@ -39,25 +33,30 @@ public class AuthService {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid_credentials", "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId());
+        // 토큰 생성
+        String accessToken = tokenProvider.generateAccessToken(user.getId());
+        String refreshToken = tokenProvider.generateRefreshToken(user.getId());
 
-        Optional<RefreshToken> savedTokenOpt = refreshTokenRepository.findByUserId(user.getId());
+        // refresh token DB 저장 or 업데이트
+        refreshTokenRepository.findByUserId(user.getId())
+                .ifPresentOrElse(
+                        savedToken -> {
+                            savedToken.updateToken(refreshToken);
+                            savedToken.updateExpireAt();
+                        },
+                        () -> refreshTokenRepository.save(
+                                RefreshToken.builder()
+                                        .user(user)
+                                        .token(refreshToken)
+                                        .build()
+                        )
+                );
 
-        if (savedTokenOpt.isPresent()) {
-            RefreshToken savedToken = savedTokenOpt.get();
-            savedToken.updateToken(refreshToken);
-            savedToken.updateExpireAt();
-        } else {
-            refreshTokenRepository.save(
-                    RefreshToken.builder()
-                            .user(user)
-                            .token(refreshToken)
-                            .build()
-            );
-        }
-
-        return UserLoginResponse.of(user, accessToken, refreshToken);
+        return new LoginTokens(
+                user,
+                accessToken,
+                refreshToken
+        );
     }
 
     public void logout(Long userId) {
@@ -69,9 +68,9 @@ public class AuthService {
         refreshTokenRepository.delete(token);
     }
 
-    public TokenResponse reissue(String refreshToken) {
+    public LoginTokens reissue(String oldRefreshToken) {
 
-        RefreshToken savedToken = refreshTokenRepository.findByToken(refreshToken)
+        RefreshToken savedToken = refreshTokenRepository.findByToken(oldRefreshToken)
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.UNAUTHORIZED,
                         "invalid_refresh_token",
@@ -87,12 +86,19 @@ public class AuthService {
             );
         }
 
-        String newAccessToken = jwtTokenProvider.generateAccessToken(savedToken.getUser().getId());
+        User user = savedToken.getUser();
 
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(savedToken.getUser().getId());
+        String newAccessToken = tokenProvider.generateAccessToken(user.getId());
+        String newRefreshToken = tokenProvider.generateRefreshToken(user.getId());
+
         savedToken.updateToken(newRefreshToken);
         savedToken.updateExpireAt();
 
-        return new TokenResponse(newAccessToken, newRefreshToken);
+        return new LoginTokens(
+                user,
+                newAccessToken,
+                newRefreshToken
+        );
     }
+
 }
